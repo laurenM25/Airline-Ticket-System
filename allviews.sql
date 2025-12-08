@@ -64,7 +64,7 @@ JOIN airport a_arr ON f.arrival_airport   = a_arr.name;
 
 CREATE OR REPLACE VIEW browse_flights AS
 SELECT uf.*, a.seat_capacity - COUNT(t.ticket_id) AS available_seats
-FROM (upcoming_flights uf JOIN airplane a ON uf.airplane_id = a.id AND uf.airline_name = a.airline_name) JOIN (ticket t JOIN purchases p ON t.ticket_id=p.ticket_id) ON uf.flight_num = t.flight_num
+FROM (upcoming_flights uf JOIN airplane a ON uf.airplane_id = a.id AND uf.airline_name = a.airline_name)
 GROUP BY uf.flight_num
 HAVING available_seats > 0;
 

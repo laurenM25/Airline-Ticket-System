@@ -134,16 +134,10 @@ create table permission (
 
 create table city_alias (
     alias_name varchar(100),
-    city varchar(100),
-    primary key (alias_name, city),
-    foreign key (city)
+    city_name varchar(100),
+    primary key (alias_name, city_name),
+    foreign key (city_name)
         references city(name)
         on delete cascade
         on update cascade);
 
-
--- VIEWS
-CREATE OR REPLACE VIEW upcoming_flights AS 
-SELECT f.*, a1.city as departure_city, a2.city as destination_city
-FROM (flight f JOIN airport a1 ON f.departure_airport = a1.name) JOIN airport a2 ON f.arrival_airport = a2.name
-WHERE departure_time > NOW();
