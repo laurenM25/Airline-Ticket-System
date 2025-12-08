@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Analytics</title>
+    <link rel="stylesheet" href="static/general.css">
+
+    <!--fix issue-->
+    <script>
+        const ticket_labels = {{ ticket_labels | tojson | safe }};
+        const ticket_values = {{ ticket_values | tojson | safe }};
+        const commission_labels = {{ commission_labels | tojson | safe }};
+        const commission_values = {{ commission_values | tojson | safe }};
+    </script>
+</head>
+
+<body>
+    <div class="basicHomeFuncs">
+        <a class='page-link' href="/flightStatus">Search flight status</a>
+        <a class='page-link' href="/home">Go Home</a>
+        <a class='page-link' href="/logout">log out</a>
+    </div>
+    <div>
+        <p>Total commission in past 30 days: {{commissions_total}}</p>
+        <p>Average commission per ticket in past 30 days: ${{avg_commission | round(2)}}</p>
+        <!--used jinja filter for decimal formatting-->
+        <p>Number of tickets sold all time: {{num_tickets_sold}}</p>
+    </div>
+    <div>
+        <!-- using Chart.js to make bar chart -->
+        <canvas id="top5-ticket" style="width:100%;max-width:700px"></canvas>
+
+        <canvas id="top5-commission" style="width:100%;max-width:700px"></canvas>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script>
+        const ctx = document.getElementById('top5-ticket');
+
+        const barChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ticket_labels,
+                datasets: [{
+                    backgroundColor: "steelblue",
+                    data: ticket_values
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Top 5 Customers by Number of Tickets Sold in Past 6 months"
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,           // start from 0
+                            stepSize: 1,                 // force integer steps
+                            callback: function (value) {  // make sure it displays as integer
+                                return Number.isInteger(value) ? value : null;
+                            }
+                        }
+                    }]
+                }
+
+            }
+        });
+    </script>
+    <script>
+        const ctx2 = document.getElementById('top5-commission');
+
+        const barChart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: commission_labels,
+                datasets: [{
+                    backgroundColor: "steelblue",
+                    data: commission_values
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Top 5 Customers by Cumulative Commisions in Past 12 months"
+                }
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,  // start from 0
+                        callback: function (value) {
+                            return '$' + value;  // prepend $ to tick labels
+                        }
+                    }
+                }]
+            }
+        });
+    </script>
+</body>
+
+</html>

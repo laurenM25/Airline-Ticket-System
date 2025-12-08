@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="static/general.css">
+</head>
+
+<body>
+    <div class="top-bar">
+        <a href="/home">home</a>
+    </div>
+
+    <div class="table-view">
+        <input type="text" id="filter-depart-airport" onkeyup="myFunction()" placeholder="Filter by departing airport">
+        <input type="text" id="filter-arriv-airport" onkeyup="myFunction()" placeholder="Filter by arriving airport">
+        <input type="text" id="filter-depart-city" onkeyup="myFunction()" placeholder="Filter by departing city">
+        <input type="text" id="filter-arriv-city" onkeyup="myFunction()" placeholder="Filter by arriving city">
+        <input type="text" id="filter-depart-time" onkeyup="myFunction()" placeholder="Filter by departing time">
+
+        <table id="myTable">
+            <tr>
+                <th>Airline</th>
+                <th>Flight No.</th>
+                <th>Departure Airport</th>
+                <th>Departure City</th>
+                <th>Departure Time</th>
+                <th>Arrival Airport</th>
+                <th>Arrival City</th>
+                <th>Arrival Time</th>
+                <th>Ticket Price</th>
+                <th>Status</th>
+                <th>Airplane ID</th>
+                <th>Capacity</th>
+                <th></th>
+            </tr>
+
+            {% for row in table %}
+            <tr>
+                {% for col in row %}
+                <td>{{ col }}</td>
+                {% endfor %}
+                <!-- buy link (matches app.py: flightnum param) -->
+                <td>
+                    <a href="/checkoutAgent?airline={{ row[0] }}&flightnum={{ row[1] }}">buy</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- Alias map injected from Flask context processor -->
+        <script>
+            window.CITY_ALIAS_MAP = {
+              {% for alias, city in city_aliases %}
+                "{{ alias|lower }}": "{{ city }}",
+              {% endfor %}
+            };
+        </script>
+
+        <script>
+            // Agent browse filtering with multi-alias city support
+            function myFunction() {
+                // inputs from user
+                var filter1 = document.getElementById("filter-depart-airport").value.trim().toUpperCase();
+                var filter2 = document.getElementById("filter-arriv-airport").value.trim().toUpperCase();
+
+                var raw3 = document.getElementById("filter-depart-city").value.trim();
+                var raw4 = document.getElementById("filter-arriv-city").value.trim();
+
+                var filter5 = document.getElementById("filter-depart-time").value.trim().toUpperCase();
+
+                // resolve aliases
+                var map = window.CITY_ALIAS_MAP || {};
+                var resolved3 = map[raw3.toLowerCase()] || raw3;
+                var resolved4 = map[raw4.toLowerCase()] || raw4;
+
+                var filter3 = resolved3.trim().toUpperCase();
+                var filter4 = resolved4.trim().toUpperCase();
+
+                // table rows
+                var table = document.getElementById("myTable");
+                var tr = table.getElementsByTagName("tr");
+
+                // go through rows
+                for (var i = 1; i < tr.length; i++) {
+                    var td1 = tr[i].getElementsByTagName("td")[2]; // departure airport
+                    var td2 = tr[i].getElementsByTagName("td")[5]; // arrival airport
+                    var td3 = tr[i].getElementsByTagName("td")[3]; // departure city
+                    var td4 = tr[i].getElementsByTagName("td")[6]; // arrival city
+                    var td5 = tr[i].getElementsByTagName("td")[4]; // departure time
+
+                    let match1 = !filter1 || (td1 && td1.textContent.toUpperCase().includes(filter1));
+                    let match2 = !filter2 || (td2 && td2.textContent.toUpperCase().includes(filter2));
+                    let match3 = !filter3 || (td3 && td3.textContent.toUpperCase().includes(filter3));
+                    let match4 = !filter4 || (td4 && td4.textContent.toUpperCase().includes(filter4));
+                    let match5 = !filter5 || (td5 && td5.textContent.toUpperCase().includes(filter5));
+
+                    tr[i].style.display = (match1 && match2 && match3 && match4 && match5) ? "" : "none";
+                }
+            }
+        </script>
+
+    </div>
+
+</body>
+
+</html>
+
+

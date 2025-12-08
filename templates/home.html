@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="static/general.css">
+    <title>Air Ticket Reservation</title>
+</head>
+
+<body>
+    <div class="basicHomeFuncs">
+        <a class='page-link' href="/upcomingFlights">Check out upcoming flights</a>
+        <a class='page-link' href="/flightStatus">Check flight status for an in-progress flight</a>
+        <a class='page-link' href="/logout">log out</a>
+        {% if usertype %}
+        {% if usertype == "customer" %}
+        <a class='page-link' href="/browseFlights">Browse Flights</a>
+        <a class='page-link' href="/purchasedFlights">View purchased flights</a>
+        <a class='page-link' href="/spendingStats">View spending stats</a>
+        {% endif %}
+
+        {% if usertype == "agent" %}
+        <a class='page-link' href="/purchasedFlightsA">View flights purchased for clients</a>
+        <a class='page-link' href="/browseFlightsA">Browse flights</a>
+        <a class='page-link' href="/analyticsA">Analytics</a>
+        {% endif %}
+
+        {% if usertype == "airline_staff" %}
+        <a class='page-link' href="/upcomingFlightsStaff">View upcoming flights for your airline</a>
+        <a class='page-link' href="/passengerList">Check passenger list by flight number</a>
+        <a class='page-link' href="/customersFlights">Look up flights taken by a customer</a>
+        <a class='page-link' href="/analyticsStaff">Analytics</a>
+        {% endif %}
+
+        {% endif %}
+
+        {% if specialperm %}
+        {% if "admin" in specialperm %}
+        <a class='page-link' href="/addAirport">Add new airport</a>
+        <a class='page-link' href="/addAirplane">Add new airplane</a>
+        <a class='page-link' href="/createFlight">Create flight</a>
+        <a class='page-link' href="/assignAgent">Assign agent to airline</a>
+        {% endif %}
+
+        {% if "operator" in specialperm %}
+        <a class='page-link' href="/updateStatus">Update flight status</a>
+        {% endif %}
+        {% endif %}
+    </div>
+</body>
+
+</html>

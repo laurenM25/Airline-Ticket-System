@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Check out</title>
+    <link rel="stylesheet" href="static/general.css">
+</head>
+
+<body>
+    <div>
+        <table>
+            <tr>
+                {% for col in columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for col in flight_row %}
+                <td>{{ col }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+
+    <div>
+        {# Find which seat column exists in this query #}
+        {% if 'available_seats' in columns %}
+            {% set avail = (flight_row[columns.index('available_seats')]|int) %}
+        {% elif 'capacity' in columns %}
+            {% set avail = (flight_row[columns.index('capacity')]|int) %}
+        {% else %}
+            {% set avail = 0 %}
+        {% endif %}
+
+        <p><b>Seats available:</b> {{ avail }}</p>
+
+        {% if avail <= 0 %}
+            <p style="color: red; font-weight: 600;">No seats available for this flight.</p>
+        {% endif %}
+
+        {# Agent checkout has custlist, customer checkout does not #}
+        {% set is_agent_checkout = custlist is defined and custlist %}
+
+        <form action="{{ url_for('completePurchaseAgent') if is_agent_checkout else url_for('completePurchase') }}"
+              method="POST">
+
+            <label for="quantity">Select quantity of tickets:</label>
+
+            <select name="quantity" id="quantity" required {% if avail <= 0 %}disabled{% endif %}>
+                {# cap at 3 like your original, but don't exceed available seats #}
+                {% set max_qty = 3 if avail > 3 else avail %}
+                {% for q in range(1, max_qty + 1) %}
+                    <option value="{{ q }}">{{ q }}</option>
+                {% endfor %}
+            </select>
+            <br>
+
+            {% if is_agent_checkout %}
+                <label for="cust_username">Select a customer:</label>
+                <select name="cust_username" id="cust_username" required>
+                    {% for cust in custlist %}
+                        <option value="{{ cust }}">{{ cust }}</option>
+                    {% endfor %}
+                </select>
+            {% endif %}
+
+            <input type="hidden" name="airline" value="{{ flight_row[0] }}">
+            <input type="hidden" name="flight_num" value="{{ flight_row[1] }}">
+
+            <input type="submit" value="Submit" {% if avail <= 0 %}disabled{% endif %}>
+        </form>
+    </div>
+
+    <div>
+        <a href="/browseFlights">Exit to browse flights</a>
+        <a href="/home">Go home</a>
+    </div>
+
+</body>
+
+</html>
+

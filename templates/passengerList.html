@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Passenger List</title>
+    <link rel="stylesheet" href="static/general.css">
+</head>
+
+<body>
+    <div class="basicHomeFuncs">
+        <a class='page-link' href="/flightStatus">Search flight status</a>
+        <a class='page-link' href="/home">Go Home</a>
+        <a class='page-link' href="/logout">log out</a>
+    </div>
+
+    <div class="table-view">
+        <input type="text" id="filter-flight-no" onkeyup="myFunction()" placeholder="Group by flight number">
+        <input type="text" id="filter-customer" onkeyup="myFunction()" placeholder="Group by customer email">
+
+        <table id="myTable">
+            <tr>
+                {% for col in columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+
+            {% for row in table %}
+            <tr>
+                {% for item in row %}
+                <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+
+        <script>
+            function myFunction() {
+                var filter1 = document.getElementById("filter-flight-no").value.toUpperCase();
+                var filter2 = document.getElementById("filter-customer").value.toUpperCase();
+
+                var table = document.getElementById("myTable");
+                var tr = table.getElementsByTagName("tr");
+
+                for (var i = 1; i < tr.length; i++) {
+                    var td1 = tr[i].getElementsByTagName("td")[1]; // flight number
+                    var td2 = tr[i].getElementsByTagName("td")[4]; // customer email
+
+                    let match1 = !filter1 || (td1 && td1.textContent.toUpperCase().includes(filter1));
+                    let match2 = !filter2 || (td2 && td2.textContent.toUpperCase().includes(filter2));
+
+                    tr[i].style.display = (match1 && match2) ? "" : "none";
+                }
+            }
+        </script>
+    </div>
+</body>
+</html>

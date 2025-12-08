@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Register Directory</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='general.css') }}">
+</head>
+<body>
+  <h1>Register</h1>
+  <p>Choose what type of account you want to create:</p>
+
+  <ul>
+    <li><a href="{{ url_for('registerCustomerPage') }}">Register as Customer</a></li>
+    <li><a href="{{ url_for('registerAgentPage') }}">Register as Booking Agent</a></li>
+    <li><a href="{{ url_for('registerStaffPage') }}">Register as Airline Staff (Admin/Operator)</a></li>
+  </ul>
+
+  <p><a href="{{ url_for('login') }}">Back to Login</a></p>
+</body>
+</html>

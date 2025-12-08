@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add {{add_type}}</title>
+    <link rel="stylesheet" href="static/general.css">
+    <script>
+        function validateForm() {
+            let depart_airport = document.forms["myForm"]["departure-airport"].value;
+            let arriv_airport = document.forms["myForm"]["arrival-airport"].value;
+            if (depart_airport == arriv_airport) {
+                alert("The departure airport and arrival airport for the flight cannot be the same.");
+                return false;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="basicHomeFuncs">
+        <a class='page-link' href="/home">home</a>
+        <a class='page-link' href="/logout">log out</a>
+    </div>
+    <div>
+        <!--adding airport-->
+        {% if add_type=="airport" %}
+
+        {% if success %}
+          <p style="color: green; font-weight: 600;">{{ success }}</p>
+        {% endif %}
+        {% if error %}
+          <p style="color: red; font-weight: 600;">{{ error }}</p>
+        {% endif %}
+        
+        <form action="/confirmAddition" method="POST">
+            <input type="hidden" name="add-type" id="add-type" value="{{add_type}}">
+            <input type="text" name="airport-name" id="airport-name" placeholder="Enter the airport name" required>
+            <input type="text" name="city-name" id="city-name" placeholder="Enter the city name" required>
+            <input type="submit" value="Submit">
+        </form>
+        {% endif %}
+        
+
+        <!--adding airplane-->
+        {% if add_type=="airplane" %}
+            {% if success %}
+            <p style="color: green; font-weight: 600;">{{ success }}</p>
+            {% endif %}
+            {% if error %}
+            <p style="color: red; font-weight: 600;">{{ error }}</p>
+            {% endif %}
+
+        <form action="/confirmAddition" method="POST">
+            <input type="hidden" name="add-type" id="add-type" value="{{add_type}}">
+            <input type="hidden" name="airline-name" id="airline-name" value="{{airline}}">
+            <input type="number" name="plane-id" id="plane-id" placeholder="Enter the new plane's ID" required>
+            <input type="text" name="plane-capacity" id="plane-capacity" placeholder="Enter the plane's capacity"
+                required>
+            <input type="submit" value="Submit">
+        </form>
+        {% endif %}
+
+        <!--adding flight-->
+        {% if add_type=="flight" %}
+
+        {% if success %}
+          <p style="color: green; font-weight: 600;">{{ success }}</p>
+        {% endif %}
+        {% if error %}
+          <p style="color: red; font-weight: 600;">{{ error }}</p>
+        {% endif %}
+        
+        <form name="myForm" action="/confirmAddition" onsubmit="return validateForm()" method="post">
+            <input type="hidden" name="add-type" id="add-type" value="{{add_type}}">
+            <input type="hidden" name="airline-name" id="airline-name" value="{{airline}}">
+            <input type="text" name="flight-num" id="flight-num" placeholder="Enter the flight number" required>
+            <input type="datetime" name="departure-time" id="departure-time" placeholder="Enter the departure time"
+                required>
+            <input type="datetime" name="arrival-time" id="arrival-time" placeholder="Enter the arrival time" required>
+            <input type="number" name="ticket-price" id="ticket-price" placeholder="Enter the standard ticket price"
+                required>
+
+            <!--the following inputs must be selected from a list.-->
+            <input list="plane-ID-options" name="plane-id" id="plane-id" placeholder="Enter the plane's ID" required>
+            <datalist id="plane-ID-options">
+                {% for ID in planeIDs %}
+                <option value="{{ID}}">{{ID}}</option>
+                {% endfor %}
+            </datalist>
+            <input list="airplane-options" name="departure-airport" id="departure-airport" required
+                placeholder="Enter the airport of departure">
+            <input list="airplane-options" name="arrival-airport" id="arrival-airport"
+                placeholder="Enter the airport of arrival" required>
+            <datalist id="airplane-options">
+                {% for airport in airports %}
+                <option value="{{airport}}">{{airport}}</option>
+                {% endfor %}
+            </datalist>
+            <input type="submit" value="Submit">
+        </form>
+
+        {% endif %}
+
+        <!--assigning agent to airline-->
+        {% if add_type=="assignAgent" %}
+
+        {% if success %}
+        <p style="color: green; font-weight: 600;">{{ success }}</p>
+        {% endif %}
+        {% if error %}
+        <p style="color: red; font-weight: 600;">{{ error }}</p>
+        {% endif %}
+
+        <form action="/confirmAddition" method="POST">
+            <input type="hidden" name="add-type" id="add-type" value="{{add_type}}">
+            <input type="hidden" name="airline-name" id="airline-name" value="{{airline}}">
+
+            <input list="agent-options" name="agent" id="agent" required
+                placeholder="Enter the agent email to establish a relationship with {{airline}}.">
+            <datalist id="agent-options">
+                {% for agent in agents %}
+                <option value="{{agent}}">{{agent}}</option>
+                {% endfor %}
+            </datalist>
+
+            <input type="submit" value="Submit">
+        </form>
+
+        {% endif %}
+
+    </div>
+
+</body>
+
+</html>

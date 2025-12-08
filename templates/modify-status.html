@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Modify flight status</title>
+    <link rel="stylesheet" href="static/general.css">
+</head>
+
+<body>
+    <div class="basicHomeFuncs">
+        <a class='page-link' href="/home">home</a>
+        <a class='page-link' href="/logout">log out</a>
+    </div>
+
+    <div>
+        <h2>Modify Flight Status ({{ airline }})</h2>
+
+        {% if success %}
+          <p style="color: green; font-weight: 600;">{{ success }}</p>
+        {% endif %}
+        {% if error %}
+          <p style="color: red; font-weight: 600;">{{ error }}</p>
+        {% endif %}
+
+        <form action="/confirmStatusUpdate" method="POST">
+            <label for="flight-num">Select flight:</label>
+            <select name="flight-num" id="flight-num" required>
+                {% for f in flights %}
+                  <!-- f = (flight_num, dep_time, arr_time, dep_airport, arr_airport, status) -->
+                  <option value="{{ f[0] }}">{{ f[0] }} — {{ f[3] }}→{{ f[4] }} — current: {{ f[5] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="new-status">New status:</label>
+            <select name="new-status" id="new-status" required>
+                <option value="upcoming">upcoming</option>
+                <option value="in-progress">in-progress</option>
+                <option value="delayed">delayed</option>
+            </select>
+
+            <input type="submit" value="Update Status">
+        </form>
+
+        <hr>
+
+        <h3>Your flights</h3>
+        <table border="1" cellpadding="6">
+            <tr>
+                <th>Flight #</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+            </tr>
+            {% for f in flights %}
+            <tr>
+                <td>{{ f[0] }}</td>
+                <td>{{ f[1] }}</td>
+                <td>{{ f[2] }}</td>
+                <td>{{ f[3] }}</td>
+                <td>{{ f[4] }}</td>
+                <td>{{ f[5] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

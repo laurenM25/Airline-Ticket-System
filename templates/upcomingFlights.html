@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="static/general.css">
+</head>
+
+<body>
+    <div class="basicHomeFuncs">
+        <a class='page-link' href="/flightStatus">Search flight status</a>
+        <a class='page-link' href="/home">Go Home</a>
+        <a class='page-link' href="/logout">log out</a>
+    </div>
+
+    <div class="table-view">
+        <input type="text" id="filter-depart-airport" onkeyup="myFunction()" placeholder="Filter by departing airport">
+        <input type="text" id="filter-arriv-airport" onkeyup="myFunction()" placeholder="Filter by arriving airport">
+        <input type="text" id="filter-depart-city" onkeyup="myFunction()" placeholder="Filter by departing city">
+        <input type="text" id="filter-arriv-city" onkeyup="myFunction()" placeholder="Filter by arriving city">
+        <input type="text" id="filter-depart-time" onkeyup="myFunction()" placeholder="Filter by departing time">
+
+        <table id="myTable">
+            <tr>
+                <th>Airline</th>
+                <th>Flight No.</th>
+                <th>Departure Airport</th>
+                <th>Departure City/City Alias</th>
+                <th>Departure Time</th>
+                <th>Arrival Airport</th>
+                <th>Arrival City/Alias City</th>
+                <th>Arrival Time</th>
+                <th>Ticket Price</th>
+                <th>Status</th>
+                <th>Airplane ID</th>
+            </tr>
+
+            {% for row in table %}
+            <tr>
+                {% for col in row %}
+                <td>{{col}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+
+        
+
+        <script>
+            window.CITY_ALIAS_MAP = {};
+            {% for a in city_aliases %}
+              window.CITY_ALIAS_MAP[{{ a[0]|tojson }}.toLowerCase()] = {{ a[1]|tojson }};
+            {% endfor %}
+
+          </script>
+          
+          
+
+        <script>
+
+            
+            // Script for filtering table
+            function myFunction() {
+                // inputs from user
+                var filter1 = document.getElementById("filter-depart-airport").value.toUpperCase();
+                var filter2 = document.getElementById("filter-arriv-airport").value.toUpperCase();
+
+                // can filter through aliases
+                
+                var raw3 = document.getElementById("filter-depart-city").value.trim();
+                var raw4 = document.getElementById("filter-arriv-city").value.trim();
+
+                var resolved3 = window.CITY_ALIAS_MAP[raw3.toLowerCase()] || raw3;
+                var resolved4 = window.CITY_ALIAS_MAP[raw4.toLowerCase()] || raw4;
+
+                var filter3 = resolved3.toUpperCase();
+                var filter4 = resolved4.toUpperCase();
+
+          
+
+                var filter5 = document.getElementById("filter-depart-time").value.toUpperCase();
+
+                //getting table contents
+                var table = document.getElementById("myTable");
+                // rows
+                var tr = table.getElementsByTagName("tr");
+
+                // go through all the rows, checking if row passes the filters. If not, exclude.
+                for (var i = 1; i < tr.length; i++) {
+                    var td1 = tr[i].getElementsByTagName("td")[2]; // departure airport
+                    var td2 = tr[i].getElementsByTagName("td")[5]; // arrival airport
+                    var td3 = tr[i].getElementsByTagName("td")[3]; // departure city
+                    var td4 = tr[i].getElementsByTagName("td")[6]; // arrival city
+                    var td5 = tr[i].getElementsByTagName("td")[4]; // departure time
+
+                    // logic: if the input does not exist, match is true (no filter provided). otherwise (filter provided), check if table val includes filter.
+                    let match1 = !filter1 || (td1 && td1.textContent.toUpperCase().includes(filter1));
+                    let match2 = !filter2 || (td2 && td2.textContent.toUpperCase().includes(filter2));
+                    let match3 = !filter3 || (td3 && td3.textContent.toUpperCase().includes(filter3));
+                    let match4 = !filter4 || (td4 && td4.textContent.toUpperCase().includes(filter4));
+                    let match5 = !filter5 || (td5 && td5.textContent.toUpperCase().includes(filter5));
+
+                    // if any of the filters fail, exclude. Otherwise, include.
+                    tr[i].style.display = (match1 && match2 && match3 && match4 && match5) ? "" : "none";
+                }
+            }
+        </script>
+    </div>
+
+
+</body>
+
+</html>

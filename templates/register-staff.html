@@ -1,0 +1,32 @@
+<html>
+<head></head>
+<body>
+  <form action="{{ url_for('registerStaffAuth') }}" method="POST">
+    <input type="text" name="username" placeholder="enter username" required /><br>
+    <input type="password" name="password" placeholder="enter password" required /><br>
+
+    <input type="text" name="airline_name" placeholder="enter associated airline" required /><br>
+
+    <label>Role</label>
+    <select name="permission_type" required>
+      <option value="admin">admin</option>
+      <option value="operator">operator</option>
+    </select>
+    <br><br>
+
+    <!-- Optional fields (won’t be stored unless you update app.py to insert them) -->
+    <input type="text" name="fname" placeholder="first name" /><br>
+    <input type="text" name="lname" placeholder="last name" /><br>
+    <label>Date of birth</label>
+    <input type="date" name="DOB" /><br><br>
+
+    <input type="submit" value="Register" />
+
+    {% if error %}
+      <p class="error"><strong>Error:</strong> {{ error }}</p>
+    {% endif %}
+  </form>
+
+  <a href="/">Go back</a>
+</body>
+</html>

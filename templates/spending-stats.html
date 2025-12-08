@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="static/general.css">
+    <title>Check Flight Status</title>
+
+    <!--relevant data-->
+    <script>
+        window.monthlyLabels = {{ monthly.keys() | list | tojson }};
+        window.monthlyValues = {{ monthly.values() | list | tojson }};
+    </script>
+</head>
+
+<body>
+    <div class="basicHomeFuncs">
+        <a class='page-link' href="/upcomingFlights">Check out upcoming flights</a>
+        <a class='page-link' href="/home">Go Home</a>
+        <a class='page-link' href="/logout">log out</a>
+    </div>
+
+    <div>
+        <input type="date" id="filter-start-date" placeholder="Start date"
+            value="{{ start_date.strftime('%Y-%m-%d') }}">
+        <input type="date" id="filter-end-date" placeholder="End date" value="{{ end_date.strftime('%Y-%m-%d') }}">
+    </div>
+    <div>
+        <div class="table-view">
+
+            <table id="myTable">
+                <tr>
+                    <th>purchase date</th>
+                    <th>ticket price</th>
+                </tr>
+
+                {% for row in table %}
+                <tr>
+                    {% for col in row %}
+                    <td>{{col}}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div>
+            <!-- using Chart.js to make bar chart -->
+            <canvas id="barChart" style="width:100%;max-width:700px"></canvas>
+        </div>
+        <div>
+            <a href="/spendingStats">Back to default view</a>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+        <script>
+            const ctx = document.getElementById('barChart');
+
+            const barChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [{
+                        backgroundColor: "steelblue",
+                        data: monthlyValues
+                    }]
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: "Monthly Spending"
+                    }
+                }
+            });
+
+            // on update of time range filter...
+            async function fetchSpendingData() {
+                const start = document.getElementById("filter-start-date").value;
+                const end = document.getElementById("filter-end-date").value;
+
+                const url = `/spendingStats/data?start=${start}&end=${end}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                updateTable(data.rows);
+                updateChart(data.monthly_labels, data.monthly_values);
+            }
+            //update table presented on the page
+            function updateTable(rows) {
+                const table = document.getElementById("myTable");
+
+                // remove old data rows
+                while (table.rows.length > 1) {
+                    table.deleteRow(1);
+                }
+
+                // insert new rows
+                for (const r of rows) {
+                    const row = table.insertRow();
+                    row.insertCell().innerText = r[0];
+                    row.insertCell().innerText = r[1];
+                }
+            }
+
+            // update chart
+            function updateChart(labels, values) {
+                barChart.data.labels = labels;
+                barChart.data.datasets[0].data = values;
+                barChart.update();
+            }
+
+            // listen for changes to start and end range filters, trigger fetchSpendingData if activated
+            document.getElementById("filter-start-date").addEventListener("input", fetchSpendingData);
+            document.getElementById("filter-end-date").addEventListener("input", fetchSpendingData);
+
+        </script>
+
+    </div>
+
+</body>
+
+</html>

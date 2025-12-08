@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Analytics</title>
+    <link rel="stylesheet" href="static/general.css">
+</head>
+
+<body>
+    <div class="basicHomeFuncs">
+        <a class='page-link' href="/flightStatus">Search flight status</a>
+        <a class='page-link' href="/home">Go Home</a>
+        <a class='page-link' href="/logout">log out</a>
+    </div>
+    <div>
+        <p>Top agent </p>
+        <table id="agent-by-tick">
+            <tr>
+                <th>Year</th>
+                <th>Month</th>
+                <th>Agent email</th>
+                <th>Tickets Sold</th>
+            </tr>
+            {% for row in agent_tick %}
+            <tr>
+                {% for entry in row %}
+                <td>{{entry}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+
+        <table id="agent-by-comm">
+            <tr>
+                <th>Year</th>
+                <th>Month</th>
+                <th>Agent email</th>
+                <th>Total Commission</th>
+            </tr>
+            {% for row in agent_comm %}
+            <tr>
+                {% for entry in row %}
+                <td>{{entry}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+
+        <p>Top customer within last year: {{top_customer}}</p>
+
+        <p>Tickets sold per month</p>
+        <table>
+            <tr>
+                <th>Year</th>
+                <th>Month</th>
+                <th>Tickets Sold</th>
+            </tr>
+            {% for row in monthly_tickets_data %}
+            <tr>
+                {% for entry in row %}
+                <td>{{entry}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+</body>
+
+</html>
