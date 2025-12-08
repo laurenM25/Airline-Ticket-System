@@ -8,10 +8,9 @@
 <body>
     <div class="basicHomeFuncs">
         <a class='page-link' href="/home">Home</a>
-        <a class='page-link' href="/logout">log out</a>
+        <a class='logout-link' href="/logout">log out</a>
 
         <a class='page-link' href="/browseFlights">Browse Flights</a>
-        <a class='page-link' href="/purchasedFlights">View purchased flights</a>
         <a class='page-link' href="/spendingStats">View spending stats</a>
 
     </div>
@@ -43,10 +42,10 @@
         <script>
             window.CITY_ALIAS_MAP = {};
             {% for a in city_aliases %}
-              window.CITY_ALIAS_MAP[{{ a[0]|tojson }}.toLowerCase()] = {{ a[1]|tojson }};
+            window.CITY_ALIAS_MAP[{{ a[0] | tojson }}.toLowerCase()] = { { a[1] | tojson } };
             {% endfor %}
 
-          </script>
+        </script>
 
 
         <script>
@@ -55,8 +54,8 @@
                 // inputs from user
                 var filter1 = document.getElementById("filter-depart-airport").value.toUpperCase();
                 var filter2 = document.getElementById("filter-arriv-airport").value.toUpperCase();
-                 // can filter through aliases
-                
+                // can filter through aliases
+
                 var raw3 = document.getElementById("filter-depart-city").value.trim();
                 var raw4 = document.getElementById("filter-arriv-city").value.trim();
 

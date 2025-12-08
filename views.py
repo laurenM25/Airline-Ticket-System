@@ -193,7 +193,21 @@ def upcomingFlightsByAirline(airline):
 
 def passengersPerFlight(airline):
     columns = "airline_name, flight_num, departure_time, arrival_time, customer_email, customer_name".split(", ")
-    query = f"SELECT airline_name, flight_num, departure_time, arrival_time, customer_email, customer_name FROM customers_list_for_flight WHERE airline_name='{airline}';"
+    query = f"SELECT DISTINCT airline_name, flight_num, departure_time, arrival_time, customer_email, customer_name FROM customers_list_for_flight WHERE airline_name='{airline}';"
+
+    conn = pool.get_connection()
+    cursor = conn.cursor()
+    cursor.execute(query)
+    data = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return data, columns
+
+def flightsTakenByCustomer_tab(airline, customer_email):
+    columns = "airline_name, flight_num, departure_time, arrival_time".split(",")
+    query = f"SELECT DISTINCT airline_name, flight_num, departure_time, arrival_time  FROM customers_list_for_flight WHERE customer_email = '{customer_email}' AND airline_name='{airline}';"
 
     conn = pool.get_connection()
     cursor = conn.cursor()
@@ -209,7 +223,7 @@ def passengersPerFlight(airline):
 def top_agent_by_tickets(airline):
     conn = pool.get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT YEAR(purchase_date) as Year, MONTH(purchase_date) as Month, agent_email, COUNT(ticket_id) tickets_sold FROM staff_analytics WHERE airline_name = %s GROUP BY Year, Month, agent_email ORDER BY Year, Month, tickets_sold DESC", (airline,))
+    cursor.execute("SELECT YEAR(purchase_date) as Year, MONTH(purchase_date) as Month, agent_email, COUNT(ticket_id) tickets_sold FROM staff_analytics WHERE airline_name = %s AND agent_email IS NOT NULL GROUP BY Year, Month, agent_email ORDER BY Year, Month, tickets_sold DESC", (airline,))
     data = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -227,7 +241,7 @@ def top_agent_by_tickets(airline):
 def top_agent_by_commission(airline):
     conn = pool.get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT YEAR(purchase_date) as Year, MONTH(purchase_date) as Month, agent_email, SUM(commission) AS total_commission FROM staff_analytics WHERE airline_name = %s GROUP BY Year, Month, agent_email ORDER BY Year, Month, total_commission DESC", (airline,))
+    cursor.execute("SELECT YEAR(purchase_date) as Year, MONTH(purchase_date) as Month, agent_email, SUM(commission) AS total_commission FROM staff_analytics WHERE airline_name = %s AND agent_email IS NOT NULL GROUP BY Year, Month, agent_email ORDER BY Year, Month, total_commission DESC", (airline,))
     data = cursor.fetchall()
     cursor.close()
     conn.close()

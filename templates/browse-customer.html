@@ -7,7 +7,8 @@
 
 <body>
     <div class="top-bar">
-        <a href="/home">home</a>
+        <a class='public-link' href="/home">home</a>
+        <a class='logout-link' href="/logout">log out</a>
     </div>
 
     <div class="table-view">
@@ -47,10 +48,10 @@
         <script>
             window.CITY_ALIAS_MAP = {};
             {% for a in city_aliases %}
-              window.CITY_ALIAS_MAP[{{ a[0]|tojson }}.toLowerCase()] = {{ a[1]|tojson }};
+            window.CITY_ALIAS_MAP[{{ a[0] | tojson }}.toLowerCase()] = { { a[1] | tojson } };
             {% endfor %}
 
-          </script>
+        </script>
 
 
         <script>
@@ -63,8 +64,8 @@
                 //var filter4 = document.getElementById("filter-arriv-city").value.toUpperCase();
                 var filter5 = document.getElementById("filter-depart-time").value.toUpperCase();
 
-                   // can filter through aliases
-                
+                // can filter through aliases
+
                 var raw3 = document.getElementById("filter-depart-city").value.trim();
                 var raw4 = document.getElementById("filter-arriv-city").value.trim();
 
@@ -96,7 +97,7 @@
                     let match3 = !filter3 || (td3 && td3.textContent.toUpperCase().includes(filter3));
                     let match4 = !filter4 || (td4 && td4.textContent.toUpperCase().includes(filter4));
                     let match5 = !filter5 || (td5 && td5.textContent.toUpperCase().includes(filter5));
-                    
+
                     let seats = td6 ? parseInt(td6.textContent, 10) : 0;
                     let match6 = seats > 0;
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Modify flight status</title>
     <link rel="stylesheet" href="static/general.css">
@@ -8,25 +9,25 @@
 <body>
     <div class="basicHomeFuncs">
         <a class='page-link' href="/home">home</a>
-        <a class='page-link' href="/logout">log out</a>
+        <a class='logout-link' href="/logout">log out</a>
     </div>
 
     <div>
         <h2>Modify Flight Status ({{ airline }})</h2>
 
         {% if success %}
-          <p style="color: green; font-weight: 600;">{{ success }}</p>
+        <p style="color: green; font-weight: 600;">{{ success }}</p>
         {% endif %}
         {% if error %}
-          <p style="color: red; font-weight: 600;">{{ error }}</p>
+        <p style="color: red; font-weight: 600;">{{ error }}</p>
         {% endif %}
 
         <form action="/confirmStatusUpdate" method="POST">
             <label for="flight-num">Select flight:</label>
             <select name="flight-num" id="flight-num" required>
                 {% for f in flights %}
-                  <!-- f = (flight_num, dep_time, arr_time, dep_airport, arr_airport, status) -->
-                  <option value="{{ f[0] }}">{{ f[0] }} — {{ f[3] }}→{{ f[4] }} — current: {{ f[5] }}</option>
+                <!-- f = (flight_num, dep_time, arr_time, dep_airport, arr_airport, status) -->
+                <option value="{{ f[0] }}">{{ f[0] }} — {{ f[3] }}→{{ f[4] }} — current: {{ f[5] }}</option>
                 {% endfor %}
             </select>
 
@@ -65,4 +66,5 @@
         </table>
     </div>
 </body>
+
 </html>

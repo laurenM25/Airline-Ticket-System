@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, url_for, redirect, session
+from flask import Flask, render_template, request, url_for, redirect, session, jsonify
 from mysql.connector.pooling import MySQLConnectionPool
 from views import upcomingFlightsView, inProgressFlightsView, purchasedFlightsView_customer, return_view, return_confirm_flight_to_purchase, custSpendingStats, purchasedFlightsView_agent, browseFlightsByAirline, upcomingFlightsByAirline, passengersPerFlight
+from views import top_agent_by_tickets, top_agent_by_commission, top_customer_within_year, tickets_sold_per_month, all_time_delay, all_time_onTime, top_destinations, flightsTakenByCustomer_tab
 from supplemental_funcs import (
     check_special_perm, check_related_airline,
     create_purchase_ticket_transaction,
@@ -13,7 +14,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector 
 from supplemental_funcs import compute_monthly_totals
 from views import topCustomer_byTickets, topCustomer_byCommission, commission_totals_last_30, average_commission_last_30, num_tickets_sold_all_time
-
 
 
 #Initialize the app from Flask
@@ -33,7 +33,7 @@ def home():
     if 'username' not in session:
         return render_template('index.html')
     
-    return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+    return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"),username=session.get("username"))
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -181,11 +181,58 @@ General pages, anyone can access -->
 """
 @app.route('/upcomingFlights')
 def upcomingFlights():
-    return render_template('upcomingFlights.html',table=upcomingFlightsView())
+    isLoggedIn = 'username' in session
 
-@app.route('/flightStatus')
+    if session.get("user_type") == "airline_staff":
+        return redirect(url_for('upcomingFlightsStaff'))
+    
+    return render_template('upcomingFlights.html',table=upcomingFlightsView(),isLoggedIn=isLoggedIn)
+
+@app.route('/flightStatus', methods=['GET', 'POST'])
 def inProgressFlights():
-    return render_template('in-progress-flight.html',table=inProgressFlightsView())
+    isLoggedIn = 'username' in session
+
+    if session.get("user_type") == "airline_staff":
+        return redirect(url_for('upcomingFlightsStaff'))
+    
+    #to get flight status after user inputs airline and flight number
+    #for user dropdown options
+    conn = pool.get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT airline_name, flight_num
+        FROM flight
+        ORDER BY airline_name, flight_num
+    """)
+    rows = cursor.fetchall()
+
+    airlines_and_flightnos_dict = {}
+    for airline, flightno in rows:
+        airlines_and_flightnos_dict.setdefault(airline, []).append(flightno)
+
+    #lookup
+    flight_status_result = None
+    if request.method == 'POST':
+        airline = request.form.get('airline')
+        flightno = request.form.get('flightno')
+
+        cursor.execute("""
+            SELECT status
+            FROM flight
+            WHERE airline_name=%s AND flight_num=%s
+        """, (airline, flightno))
+        result = cursor.fetchone()
+
+        if result:
+            flight_status_result = f"Flight {airline} {flightno} status: {result[0]}"
+        else:
+            flight_status_result = "Flight not found."
+
+    cursor.close()
+    conn.close()
+
+    return render_template('in-progress-flight.html',table=inProgressFlightsView(),isLoggedIn=isLoggedIn,airlines_and_flightnos=airlines_and_flightnos_dict,
+        flight_status_result=flight_status_result)
 
 """
 Pages only customer can access -->
@@ -195,6 +242,8 @@ def purchasedFlightsCust():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'customer':
+        if session.get("user_type") == 'agent':
+            return redirect(url_for('purchasedFlightsAgent'))
         return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
     
     table, columns=purchasedFlightsView_customer(session.get("username"))
@@ -270,12 +319,12 @@ def customerSpending():
 
     return render_template('spending-stats.html',table=purchase_rows, monthly=monthly_totals, start_date=start_date, end_date=end_date)
 
-    @app.route('/spendingStats/data') #for updates to time range
-    def spendingStatsData():
-        if 'username' not in session:
-            return redirect(url_for('home'))
-        elif session.get("user_type") != 'customer':
-            return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+@app.route('/spendingStats/data') #for updates to time range
+def spendingStatsData():
+    if 'username' not in session:
+        return redirect(url_for('home'))
+    elif session.get("user_type") != 'customer':
+        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
 
     username = session["username"]
 
@@ -410,6 +459,34 @@ def passengerList():
     table, columns = passengersPerFlight(session.get('associated_airline')[0])
     return render_template('passengerList.html',table=table,columns=columns)
 
+@app.route('/customersFlights')
+def flightsTakenByCustomer():
+    if 'username' not in session:
+        return redirect(url_for('home'))
+    elif session.get("user_type") != 'airline_staff':
+        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+    
+    airline = session.get('associated_airline')[0]
+    customers_list = list_of_customers(airline)
+
+    table, columns = flightsTakenByCustomer_tab(airline,customers_list[0])
+
+    return render_template('flights-taken-by-cust.html',table=table,cols=columns,cust_list = customers_list,cur_cust=customers_list[0])
+
+@app.route('/customersFlightsData')
+def customersFlightsData():
+    if 'username' not in session or session.get("user_type") != 'airline_staff':
+        return jsonify({"flights": []})
+
+    airline = session.get('associated_airline')[0]
+    customer_email = request.args.get("customer_email")
+    if not customer_email:
+        return jsonify({"flights": []})
+
+    table, columns = flightsTakenByCustomer_tab(airline, customer_email)
+
+    return jsonify({"flights": table})
+
 @app.route('/analyticsStaff')
 def analyticsStaff():
     if 'username' not in session:
@@ -417,7 +494,33 @@ def analyticsStaff():
     elif session.get("user_type") != 'airline_staff':
         return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
     
-    return render_template('analytics-staff.html')
+    airline = session.get('associated_airline')[0]
+    print(airline)
+
+    #monthly all-time view of top agents (table)
+    top_by_tick = top_agent_by_tickets(airline) #could be null
+    print("top by tick:", top_by_tick)
+    top_by_comm = top_agent_by_commission(airline) #could be null
+    print("top by comm:", top_by_comm)
+
+    topAgentExists = top_by_tick is not None
+    print("top agent exists?:", topAgentExists)
+
+    #top customer in last year (name)
+    top_customer = top_customer_within_year(airline)
+
+    #tickets sold per month (table)
+    tickets_sold_monthly = tickets_sold_per_month(airline)
+
+    #all time delay (numbers)
+    total_delays = all_time_delay(airline)
+    total_onTimes = all_time_onTime(airline)
+
+    #top destinations (tables)
+    top_dests_3mth = top_destinations(airline,3)
+    top_dests_1yr = top_destinations(airline,12)
+
+    return render_template('analytics-staff.html',topAgentExists=topAgentExists, agent_tick = top_by_tick, agent_comm = top_by_comm, top_customer = top_customer, monthly_tickets_data = tickets_sold_monthly, delays=total_delays, ontimes=total_onTimes, top_de_3 = top_dests_3mth, top_de_12 = top_dests_1yr)
 
 """
 special permissions -->
@@ -651,8 +754,8 @@ def confirmAddition():
         airline_name = session.get('associated_airline')[0]
 
         flight_num = request.form['flight-num'].strip()
-        dep_time  = request.form['departure-time'].strip()
-        arr_time  = request.form['arrival-time'].strip()
+        dep_time  = datetime.fromisoformat(request.form['departure-time'].strip())
+        arr_time  = datetime.fromisoformat(request.form['arrival-time'].strip())
         price     = request.form['ticket-price'].strip()
         plane_id  = request.form['plane-id'].strip()
         dep_airpt = request.form['departure-airport'].strip().upper()

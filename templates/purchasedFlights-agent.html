@@ -8,10 +8,9 @@
 <body>
     <div class="basicHomeFuncs">
         <a class='page-link' href="/home">Home</a>
-        <a class='page-link' href="/logout">log out</a>
+        <a class='logout-link' href="/logout">log out</a>
 
         <a class='page-link' href="/browseFlightsA">Browse Flights</a>
-        <a class='page-link' href="/purchasedFlightsA">View flights purchased for clients</a>
         <a class='page-link' href="/analyticsA">Analytics</a>
 
     </div>
@@ -44,34 +43,34 @@
             // Build city alias map from Flask context (alias_name -> city_name)
             window.CITY_ALIAS_MAP = {};
             {% for a in city_aliases %}
-              window.CITY_ALIAS_MAP[{{ a[0]|tojson }}.toLowerCase()] = {{ a[1]|tojson }};
+            window.CITY_ALIAS_MAP[{{ a[0] | tojson }}.toLowerCase()] = { { a[1] | tojson } };
             {% endfor %}
-        
+
             // Script for filtering table
             function myFunction() {
                 // inputs from user
                 var filter1 = document.getElementById("filter-depart-airport").value.toUpperCase();
                 var filter2 = document.getElementById("filter-arriv-airport").value.toUpperCase();
-        
+
                 // --- city filters with alias support ---
                 var raw3 = document.getElementById("filter-depart-city").value.trim();
                 var raw4 = document.getElementById("filter-arriv-city").value.trim();
-        
+
                 // resolve aliases: e.g. "hu city" -> "Shanghai"
                 var resolved3 = window.CITY_ALIAS_MAP[raw3.toLowerCase()] || raw3;
                 var resolved4 = window.CITY_ALIAS_MAP[raw4.toLowerCase()] || raw4;
-    
-        
+
+
                 var filter3 = resolved3.toUpperCase();
                 var filter4 = resolved4.toUpperCase();
-        
+
                 var filter5 = document.getElementById("filter-depart-time").value.toUpperCase();
                 var filter6 = document.getElementById("filter-purchase-time").value.toUpperCase(); // fixed: getElementById
-        
+
                 //getting table contents
                 var table = document.getElementById("myTable");
                 var tr = table.getElementsByTagName("tr");
-        
+
                 // go through all the rows, checking if row passes the filters. If not, exclude.
                 for (var i = 1; i < tr.length; i++) {
                     var td1 = tr[i].getElementsByTagName("td")[5]; // departure airport
@@ -80,7 +79,7 @@
                     var td4 = tr[i].getElementsByTagName("td")[9]; // arrival city
                     var td5 = tr[i].getElementsByTagName("td")[7]; // departure time
                     var td6 = tr[i].getElementsByTagName("td")[2]; // time of purchase
-        
+
                     // logic: if the input does not exist, match is true (no filter provided). otherwise, check if table val includes filter.
                     let match1 = !filter1 || (td1 && td1.textContent.toUpperCase().includes(filter1));
                     let match2 = !filter2 || (td2 && td2.textContent.toUpperCase().includes(filter2));
@@ -88,13 +87,13 @@
                     let match4 = !filter4 || (td4 && td4.textContent.toUpperCase().includes(filter4));
                     let match5 = !filter5 || (td5 && td5.textContent.toUpperCase().includes(filter5));
                     let match6 = !filter6 || (td6 && td6.textContent.toUpperCase().includes(filter6)); // fixed: uses filter6
-        
+
                     // if any of the filters fail, exclude. Otherwise, include.
                     tr[i].style.display = (match1 && match2 && match3 && match4 && match5 && match6) ? "" : "none";
                 }
             }
         </script>
-        
+
 
 
     </div>

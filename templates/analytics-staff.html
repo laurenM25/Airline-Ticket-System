@@ -8,12 +8,13 @@
 
 <body>
     <div class="basicHomeFuncs">
-        <a class='page-link' href="/flightStatus">Search flight status</a>
         <a class='page-link' href="/home">Go Home</a>
-        <a class='page-link' href="/logout">log out</a>
+        <a class='logout-link' href="/logout">log out</a>
     </div>
     <div>
-        <p>Top agent </p>
+        <H3>Top Agent </H3>
+        <p>Top agent by tickets sold:</p>
+        {% if topAgentExists %}
         <table id="agent-by-tick">
             <tr>
                 <th>Year</th>
@@ -29,7 +30,13 @@
             </tr>
             {% endfor %}
         </table>
+        {% endif %}
+        {% if not topAgentExists %}
+        <p>No ticket sales were made by agents for this airline.</p>
+        {% endif %}
 
+        <p>Top agent by total commission:</p>
+        {% if topAgentExists %}
         <table id="agent-by-comm">
             <tr>
                 <th>Year</th>
@@ -45,10 +52,15 @@
             </tr>
             {% endfor %}
         </table>
+        {% endif %}
+        {% if not topAgentExists %}
+        <p>No ticket sales were made by agents for this airline.</p>
+        {% endif %}
 
+        <H3>Top Customer</H3>
         <p>Top customer within last year: {{top_customer}}</p>
 
-        <p>Tickets sold per month</p>
+        <H3>Tickets sold per month</H3>
         <table>
             <tr>
                 <th>Year</th>

@@ -10,7 +10,9 @@
     <div class="basicHomeFuncs">
         <a class='page-link' href="/upcomingFlights">Check out upcoming flights</a>
         <a class='page-link' href="/home">Go Home</a>
-        <a class='page-link' href="/logout">log out</a>
+        {% if isLoggedIn %}
+        <a class='logout-link' href="/logout">log out</a>
+        {% endif %}
     </div>
 
     <div class="table-view">
@@ -43,6 +45,29 @@
             {% endfor %}
         </table>
 
+        <!--user lookup of any flight, get status-->
+        <form method="POST" action="/flightStatus">
+            <label>Airline:</label>
+            <select id="airline-select" name="airline" required>
+                <option value="">--Select airline--</option>
+                {% for airline in airlines_and_flightnos.keys() %}
+                <option value="{{ airline }}">{{ airline }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Flight Number:</label>
+            <select id="flightno-select" name="flightno" required>
+                <option value="">--Select flight--</option>
+            </select>
+
+            <button type="submit">Check Status</button>
+        </form>
+
+        {% if flight_status_result %}
+        <p style="margin-top:15px; font-weight:bold;">
+            {{ flight_status_result }}
+        </p>
+        {% endif %}
 
         <script>
             // Script for filtering table
@@ -69,6 +94,28 @@
                     tr[i].style.display = (match1 && match2) ? "" : "none";
                 }
             }
+        </script>
+
+        <script>
+            // script for creating flight number dropdown
+            let airlineData = {{ airlines_and_flightnos | tojson }};
+
+            // get input from first dropdown (airline) when there is a change in value
+            document.getElementById("airline-select").addEventListener("change", function () {
+                let airline = this.value;
+                let flightSelect = document.getElementById("flightno-select");
+
+                flightSelect.innerHTML = "<option value=''>--Select flight--</option>";
+
+                if (airlineData[airline]) {
+                    airlineData[airline].forEach(function (num) {
+                        let opt = document.createElement("option");
+                        opt.value = num;
+                        opt.text = num;
+                        flightSelect.appendChild(opt);
+                    });
+                }
+            });
         </script>
     </div>
 

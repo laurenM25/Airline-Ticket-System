@@ -7,7 +7,8 @@
 
 <body>
     <div class="top-bar">
-        <a href="/home">home</a>
+        <a class='public-link' href="/home">home</a>
+        <a class='logout-link' href="/logout">log out</a>
     </div>
 
     <div class="table-view">
@@ -51,8 +52,8 @@
         <script>
             window.CITY_ALIAS_MAP = {
               {% for alias, city in city_aliases %}
-                "{{ alias|lower }}": "{{ city }}",
-              {% endfor %}
+            "{{ alias|lower }}": "{{ city }}",
+                {% endfor %}
             };
         </script>
 
@@ -104,5 +105,3 @@
 </body>
 
 </html>
-
-

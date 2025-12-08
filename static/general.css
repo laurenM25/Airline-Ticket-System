@@ -26,7 +26,17 @@ body {
     padding-top: 110px;
 }
 
-.page-link {
+.page-link,
+.public-link,
+.logout-link {
     margin-right: 15px;
     margin-left: 15px;
+}
+
+.public-link {
+    color: darkgreen;
+}
+
+.logout-link {
+    color: darkred;
 }

@@ -19,19 +19,19 @@
 <body>
     <div class="basicHomeFuncs">
         <a class='page-link' href="/home">home</a>
-        <a class='page-link' href="/logout">log out</a>
+        <a class='logout-link' href="/logout">log out</a>
     </div>
     <div>
         <!--adding airport-->
         {% if add_type=="airport" %}
 
         {% if success %}
-          <p style="color: green; font-weight: 600;">{{ success }}</p>
+        <p style="color: green; font-weight: 600;">{{ success }}</p>
         {% endif %}
         {% if error %}
-          <p style="color: red; font-weight: 600;">{{ error }}</p>
+        <p style="color: red; font-weight: 600;">{{ error }}</p>
         {% endif %}
-        
+
         <form action="/confirmAddition" method="POST">
             <input type="hidden" name="add-type" id="add-type" value="{{add_type}}">
             <input type="text" name="airport-name" id="airport-name" placeholder="Enter the airport name" required>
@@ -39,16 +39,16 @@
             <input type="submit" value="Submit">
         </form>
         {% endif %}
-        
+
 
         <!--adding airplane-->
         {% if add_type=="airplane" %}
-            {% if success %}
-            <p style="color: green; font-weight: 600;">{{ success }}</p>
-            {% endif %}
-            {% if error %}
-            <p style="color: red; font-weight: 600;">{{ error }}</p>
-            {% endif %}
+        {% if success %}
+        <p style="color: green; font-weight: 600;">{{ success }}</p>
+        {% endif %}
+        {% if error %}
+        <p style="color: red; font-weight: 600;">{{ error }}</p>
+        {% endif %}
 
         <form action="/confirmAddition" method="POST">
             <input type="hidden" name="add-type" id="add-type" value="{{add_type}}">
@@ -64,19 +64,22 @@
         {% if add_type=="flight" %}
 
         {% if success %}
-          <p style="color: green; font-weight: 600;">{{ success }}</p>
+        <p style="color: green; font-weight: 600;">{{ success }}</p>
         {% endif %}
         {% if error %}
-          <p style="color: red; font-weight: 600;">{{ error }}</p>
+        <p style="color: red; font-weight: 600;">{{ error }}</p>
         {% endif %}
-        
+
         <form name="myForm" action="/confirmAddition" onsubmit="return validateForm()" method="post">
             <input type="hidden" name="add-type" id="add-type" value="{{add_type}}">
             <input type="hidden" name="airline-name" id="airline-name" value="{{airline}}">
             <input type="text" name="flight-num" id="flight-num" placeholder="Enter the flight number" required>
-            <input type="datetime" name="departure-time" id="departure-time" placeholder="Enter the departure time"
+            <!--assuming no conversion needed for timezone-->
+            <label for="departure-time">Enter the departure time</label>
+            <input type="datetime-local" name="departure-time" id="departure-time" required>
+            <label for="arrival-time">Enter the arrival time</label>
+            <input type="datetime-local" name="arrival-time" id="arrival-time" placeholder="Enter the arrival time"
                 required>
-            <input type="datetime" name="arrival-time" id="arrival-time" placeholder="Enter the arrival time" required>
             <input type="number" name="ticket-price" id="ticket-price" placeholder="Enter the standard ticket price"
                 required>
 

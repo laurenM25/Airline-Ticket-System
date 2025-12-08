@@ -8,9 +8,9 @@
 
 <body>
     <div class="basicHomeFuncs">
-        <a class='page-link' href="/upcomingFlights">Check out upcoming flights</a>
-        <a class='page-link' href="/flightStatus">Check flight status for an in-progress flight</a>
-        <a class='page-link' href="/logout">log out</a>
+        <a class='public-link' href="/upcomingFlights">Check out upcoming flights</a>
+        <a class='public-link' href="/flightStatus">Check flight status for an in-progress flight</a>
+        <a class='logout-link' href="/logout">log out</a>
         {% if usertype %}
         {% if usertype == "customer" %}
         <a class='page-link' href="/browseFlights">Browse Flights</a>
@@ -45,6 +45,9 @@
         <a class='page-link' href="/updateStatus">Update flight status</a>
         {% endif %}
         {% endif %}
+    </div>
+    <div>
+        Welcome {{username}}.
     </div>
 </body>
 

@@ -129,11 +129,14 @@ def list_of_agents():
     return data
 
 #list of customers of agent (can be any customer)
-def list_of_customers():
+def list_of_customers(airline_name=None):
     conn = pool.get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT email FROM customer;")
+    if airline_name == None:
+        cursor.execute("SELECT email FROM customer;")
+    else:
+        cursor.execute(f"SELECT DISTINCT customer_email FROM customer_analytics WHERE airline_name = '{airline_name}';")
     data = cursor.fetchall()
 
     cursor.close()
