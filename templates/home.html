@@ -3,14 +3,23 @@
 
 <head>
     <link rel="stylesheet" href="static/general.css">
+    <link rel="stylesheet" href="static/home.css">
     <title>Air Ticket Reservation</title>
 </head>
 
 <body>
-    <div class="basicHomeFuncs">
-        <a class='public-link' href="/upcomingFlights">Check out upcoming flights</a>
-        <a class='public-link' href="/flightStatus">Check flight status for an in-progress flight</a>
-        <a class='logout-link' href="/logout">log out</a>
+    <div class="topBar">
+        <div class="left-top"></div>
+        <div class="center-top">
+            <span class="webpage-title">Air Ticket Reservation </span>
+        </div>
+        <div class="right-top">
+            <span class="username">Welcome {{username}}</span>
+            <a class='logout-link' href="/logout">log out</a>
+        </div>
+    </div>
+    <div class="sideNav">
+        <h3>Tools</h3>
         {% if usertype %}
         {% if usertype == "customer" %}
         <a class='page-link' href="/browseFlights">Browse Flights</a>
@@ -35,6 +44,7 @@
 
         {% if specialperm %}
         {% if "admin" in specialperm %}
+        <h3>Admin Tools</h3>
         <a class='page-link' href="/addAirport">Add new airport</a>
         <a class='page-link' href="/addAirplane">Add new airplane</a>
         <a class='page-link' href="/createFlight">Create flight</a>
@@ -42,12 +52,15 @@
         {% endif %}
 
         {% if "operator" in specialperm %}
+        <h3>Operator Tools</h3>
         <a class='page-link' href="/updateStatus">Update flight status</a>
         {% endif %}
         {% endif %}
     </div>
-    <div>
+    <div class="main-content">
         Welcome {{username}}.
+        <a class='public-link' href="/upcomingFlights">Check out upcoming flights</a>
+        <a class='public-link' href="/flightStatus">Check flight status for an in-progress flight</a>
     </div>
 </body>
 

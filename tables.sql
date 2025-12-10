@@ -25,8 +25,8 @@ create table airport (
 create table flight (
     flight_num varchar(100) not null, 
     airline_name varchar(100) not null,
-    departure_time varchar(100) not null,
-    arrival_time varchar(100) not null,
+    departure_time DATETIME not null,
+    arrival_time DATETIME not null,
     price decimal(10,2) not null,
     status varchar(20) not null
         check (status in ('upcoming', 'in-progress', 'delayed')),

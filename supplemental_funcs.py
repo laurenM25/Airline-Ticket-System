@@ -11,10 +11,10 @@ def check_special_perm(username, user_type):
     
     #otherwise, collect staff permissions in list
     conn = pool.get_connection()
-    query = f"SELECT permission_type FROM permission WHERE airline_staff_username = '{username}';"
+    query = f"SELECT permission_type FROM permission WHERE airline_staff_username = %s;"
 
     cursor = conn.cursor()
-    cursor.execute(query)
+    cursor.execute(query,(username,))
     data = cursor.fetchall()
 
     cursor.close()
@@ -31,9 +31,9 @@ def check_related_airline(username, user_type):
     print("user type",user_type)
     conn = pool.get_connection()
     if user_type == "airline_staff":
-        query = f"SELECT airline_name FROM airline_staff WHERE username = '{username}'"
+        query = "SELECT airline_name FROM airline_staff WHERE username = %s"
         cursor = conn.cursor()
-        cursor.execute(query)
+        cursor.execute(query,(username,))
         data = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -43,9 +43,9 @@ def check_related_airline(username, user_type):
         else:
             return []
     elif user_type == "agent":
-        query = f"SELECT airline_name FROM authorized_by WHERE agent_email = '{username}'"
+        query = "SELECT airline_name FROM authorized_by WHERE agent_email = %s"
         cursor = conn.cursor()
-        cursor.execute(query)
+        cursor.execute(query,(username,))
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -70,11 +70,9 @@ def airplanes_for_airline(airline):
     conn = pool.get_connection()
     cursor = conn.cursor()
 
-    conn = pool.get_connection()
-    query = f"SELECT id FROM airplane WHERE airline_name = '{airline}';"
+    query = f"SELECT id FROM airplane WHERE airline_name = %s;"
 
-    cursor = conn.cursor()
-    cursor.execute(query)
+    cursor.execute(query,(airline,))
     data = cursor.fetchall()
 
     cursor.close()
@@ -91,10 +89,8 @@ def airports_list():
     conn = pool.get_connection()
     cursor = conn.cursor()
 
-    conn = pool.get_connection()
     query = f"SELECT name FROM airport;"
 
-    cursor = conn.cursor()
     cursor.execute(query)
     data = cursor.fetchall()
 
@@ -112,10 +108,8 @@ def list_of_agents():
     conn = pool.get_connection()
     cursor = conn.cursor()
 
-    conn = pool.get_connection()
     query = f"SELECT email FROM booking_agent;"
 
-    cursor = conn.cursor()
     cursor.execute(query)
     data = cursor.fetchall()
 
@@ -136,7 +130,7 @@ def list_of_customers(airline_name=None):
     if airline_name == None:
         cursor.execute("SELECT email FROM customer;")
     else:
-        cursor.execute(f"SELECT DISTINCT customer_email FROM customer_analytics WHERE airline_name = '{airline_name}';")
+        cursor.execute("SELECT DISTINCT customer_email FROM customer_analytics WHERE airline_name = %s;",(airline_name,))
     data = cursor.fetchall()
 
     cursor.close()

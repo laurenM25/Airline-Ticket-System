@@ -6,15 +6,69 @@
 </head>
 
 <body>
-    <div class="basicHomeFuncs">
-        <a class='page-link' href="/flightStatus">Search flight status</a>
-        <a class='page-link' href="/home">Go Home</a>
+    <div class="topBar">
+        <div class="left-top"></div>
+        <div class="center-top">
+            <span class="webpage-title">Air Ticket Reservation </span>
+        </div>
         {% if isLoggedIn %}
-        <a class='logout-link' href="/logout">log out</a>
+        <div class="right-top">
+            <span class="username">Welcome {{username}}</span>
+            <a class='logout-link' href="/logout">log out</a>
+        </div>
+        {% endif %}
+        {% if not isLoggedIn %}
+        <div class="right-top">
+            <a href="/">Back to index</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="sideNav">
+
+        <h3>Tools</h3>
+        {% if not isLoggedIn %}
+        <span>Please log in to use tools.</span>
+        {% endif %}
+
+        {% if usertype %}
+        {% if usertype == "customer" %}
+        <a class='page-link' href="/browseFlights">Browse Flights</a>
+        <a class='page-link' href="/purchasedFlights">View purchased flights</a>
+        <a class='page-link' href="/spendingStats">View spending stats</a>
+        {% endif %}
+
+        {% if usertype == "agent" %}
+        <a class='page-link' href="/purchasedFlightsA">View flights purchased for clients</a>
+        <a class='page-link' href="/browseFlightsA">Browse flights</a>
+        <a class='page-link' href="/analyticsA">Analytics</a>
+        {% endif %}
+
+        {% if usertype == "airline_staff" %}
+        <a class='page-link' href="/upcomingFlightsStaff">View upcoming flights for your airline</a>
+        <a class='page-link' href="/passengerList">Check passenger list by flight number</a>
+        <a class='page-link' href="/customersFlights">Look up flights taken by a customer</a>
+        <a class='page-link' href="/analyticsStaff">Analytics</a>
+        {% endif %}
+
+        {% endif %}
+
+        {% if specialperm %}
+        {% if "admin" in specialperm %}
+        <h3>Admin Tools</h3>
+        <a class='page-link' href="/addAirport">Add new airport</a>
+        <a class='page-link' href="/addAirplane">Add new airplane</a>
+        <a class='page-link' href="/createFlight">Create flight</a>
+        <a class='page-link' href="/assignAgent">Assign agent to airline</a>
+        {% endif %}
+
+        {% if "operator" in specialperm %}
+        <h3>Operator Tools</h3>
+        <a class='page-link' href="/updateStatus">Update flight status</a>
+        {% endif %}
         {% endif %}
     </div>
 
-    <div class="table-view">
+    <div class="main-content">
         <input type="text" id="filter-depart-airport" onkeyup="myFunction()" placeholder="Filter by departing airport">
         <input type="text" id="filter-arriv-airport" onkeyup="myFunction()" placeholder="Filter by arriving airport">
         <input type="text" id="filter-depart-city" onkeyup="myFunction()" placeholder="Filter by departing city">
@@ -44,69 +98,62 @@
             </tr>
             {% endfor %}
         </table>
-
-
-
-        <script>
-            window.CITY_ALIAS_MAP = {};
-            {% for a in city_aliases %}
-            window.CITY_ALIAS_MAP[{{ a[0] | tojson }}.toLowerCase()] = { { a[1] | tojson } };
-            {% endfor %}
-
-        </script>
-
-
-
-        <script>
-
-
-            // Script for filtering table
-            function myFunction() {
-                // inputs from user
-                var filter1 = document.getElementById("filter-depart-airport").value.toUpperCase();
-                var filter2 = document.getElementById("filter-arriv-airport").value.toUpperCase();
-
-                // can filter through aliases
-
-                var raw3 = document.getElementById("filter-depart-city").value.trim();
-                var raw4 = document.getElementById("filter-arriv-city").value.trim();
-
-                var resolved3 = window.CITY_ALIAS_MAP[raw3.toLowerCase()] || raw3;
-                var resolved4 = window.CITY_ALIAS_MAP[raw4.toLowerCase()] || raw4;
-
-                var filter3 = resolved3.toUpperCase();
-                var filter4 = resolved4.toUpperCase();
-
-
-
-                var filter5 = document.getElementById("filter-depart-time").value.toUpperCase();
-
-                //getting table contents
-                var table = document.getElementById("myTable");
-                // rows
-                var tr = table.getElementsByTagName("tr");
-
-                // go through all the rows, checking if row passes the filters. If not, exclude.
-                for (var i = 1; i < tr.length; i++) {
-                    var td1 = tr[i].getElementsByTagName("td")[2]; // departure airport
-                    var td2 = tr[i].getElementsByTagName("td")[5]; // arrival airport
-                    var td3 = tr[i].getElementsByTagName("td")[3]; // departure city
-                    var td4 = tr[i].getElementsByTagName("td")[6]; // arrival city
-                    var td5 = tr[i].getElementsByTagName("td")[4]; // departure time
-
-                    // logic: if the input does not exist, match is true (no filter provided). otherwise (filter provided), check if table val includes filter.
-                    let match1 = !filter1 || (td1 && td1.textContent.toUpperCase().includes(filter1));
-                    let match2 = !filter2 || (td2 && td2.textContent.toUpperCase().includes(filter2));
-                    let match3 = !filter3 || (td3 && td3.textContent.toUpperCase().includes(filter3));
-                    let match4 = !filter4 || (td4 && td4.textContent.toUpperCase().includes(filter4));
-                    let match5 = !filter5 || (td5 && td5.textContent.toUpperCase().includes(filter5));
-
-                    // if any of the filters fail, exclude. Otherwise, include.
-                    tr[i].style.display = (match1 && match2 && match3 && match4 && match5) ? "" : "none";
-                }
-            }
-        </script>
     </div>
+
+    <script>
+        window.CITY_ALIAS_MAP = {
+              {% for alias, city in city_aliases %}
+        "{{ alias|lower }}": "{{ city }}",
+            {% endfor %}
+            };
+    </script>
+
+    <script>
+        // Script for filtering table
+        function myFunction() {
+            // inputs from user
+            var filter1 = document.getElementById("filter-depart-airport").value.toUpperCase();
+            var filter2 = document.getElementById("filter-arriv-airport").value.toUpperCase();
+
+            // can filter through aliases
+
+            var raw3 = document.getElementById("filter-depart-city").value.trim();
+            var raw4 = document.getElementById("filter-arriv-city").value.trim();
+
+            var resolved3 = window.CITY_ALIAS_MAP[raw3.toLowerCase()] || raw3;
+            var resolved4 = window.CITY_ALIAS_MAP[raw4.toLowerCase()] || raw4;
+
+            var filter3 = resolved3.toUpperCase();
+            var filter4 = resolved4.toUpperCase();
+
+            var filter5 = document.getElementById("filter-depart-time").value.toUpperCase();
+
+            //getting table contents
+            var table = document.getElementById("myTable");
+            // rows
+            var tr = table.getElementsByTagName("tr");
+
+            // go through all the rows, checking if row passes the filters. If not, exclude.
+            for (var i = 1; i < tr.length; i++) {
+                var td1 = tr[i].getElementsByTagName("td")[2]; // departure airport
+                var td2 = tr[i].getElementsByTagName("td")[5]; // arrival airport
+                var td3 = tr[i].getElementsByTagName("td")[3]; // departure city
+                var td4 = tr[i].getElementsByTagName("td")[6]; // arrival city
+                var td5 = tr[i].getElementsByTagName("td")[4]; // departure time
+
+                // logic: if the input does not exist, match is true (no filter provided). otherwise (filter provided), check if table val includes filter.
+                let match1 = !filter1 || (td1 && td1.textContent.toUpperCase().includes(filter1));
+                let match2 = !filter2 || (td2 && td2.textContent.toUpperCase().includes(filter2));
+                let match3 = !filter3 || (td3 && td3.textContent.toUpperCase().includes(filter3));
+                let match4 = !filter4 || (td4 && td4.textContent.toUpperCase().includes(filter4));
+                let match5 = !filter5 || (td5 && td5.textContent.toUpperCase().includes(filter5));
+
+                // if any of the filters fail, exclude. Otherwise, include.
+                tr[i].style.display = (match1 && match2 && match3 && match4 && match5) ? "" : "none";
+            }
+        }
+    </script>
+
 
 
 </body>

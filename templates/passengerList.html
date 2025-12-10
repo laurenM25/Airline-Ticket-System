@@ -7,13 +7,57 @@
 </head>
 
 <body>
-    <div class="basicHomeFuncs">
-        <a class='page-link' href="/flightStatus">Search flight status</a>
-        <a class='page-link' href="/home">Go Home</a>
-        <a class='logout-link' href="/logout">log out</a>
+    <div class="topBar">
+        <div class="left-top"></div>
+        <div class="center-top">
+            <span class="webpage-title">Air Ticket Reservation </span>
+        </div>
+        <div class="right-top">
+            <span class="username">Welcome {{username}}</span>
+            <a class='logout-link' href="/logout">log out</a>
+        </div>
+    </div>
+    <div class="sideNav">
+        <h3>Tools</h3>
+        {% if usertype %}
+        {% if usertype == "customer" %}
+        <a class='page-link' href="/browseFlights">Browse Flights</a>
+        <a class='page-link' href="/purchasedFlights">View purchased flights</a>
+        <a class='page-link' href="/spendingStats">View spending stats</a>
+        {% endif %}
+
+        {% if usertype == "agent" %}
+        <a class='page-link' href="/purchasedFlightsA">View flights purchased for clients</a>
+        <a class='page-link' href="/browseFlightsA">Browse flights</a>
+        <a class='page-link' href="/analyticsA">Analytics</a>
+        {% endif %}
+
+        {% if usertype == "airline_staff" %}
+        <a class='page-link' href="/upcomingFlightsStaff">View upcoming flights for your airline</a>
+        <a class='page-link' href="/passengerList">Check passenger list by flight number</a>
+        <a class='page-link' href="/customersFlights">Look up flights taken by a customer</a>
+        <a class='page-link' href="/analyticsStaff">Analytics</a>
+        {% endif %}
+
+        {% endif %}
+
+        {% if specialperm %}
+        {% if "admin" in specialperm %}
+        <h3>Admin Tools</h3>
+        <a class='page-link' href="/addAirport">Add new airport</a>
+        <a class='page-link' href="/addAirplane">Add new airplane</a>
+        <a class='page-link' href="/createFlight">Create flight</a>
+        <a class='page-link' href="/assignAgent">Assign agent to airline</a>
+        {% endif %}
+
+        {% if "operator" in specialperm %}
+        <h3>Operator Tools</h3>
+        <a class='page-link' href="/updateStatus">Update flight status</a>
+        {% endif %}
+        {% endif %}
     </div>
 
-    <div class="table-view">
+    <div class="main-content">
         <input type="text" id="filter-flight-no" onkeyup="myFunction()" placeholder="Group by flight number">
         <input type="text" id="filter-customer" onkeyup="myFunction()" placeholder="Group by customer email">
 

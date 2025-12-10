@@ -1,5 +1,10 @@
 <html>
-<head></head>
+
+<head>
+  <title>Register</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='register-user.css') }}">
+</head>
+
 <body>
   <form action="{{ url_for('registerAgentAuth') }}" method="POST">
     <input type="email" name="email" placeholder="enter email" required /><br>
@@ -7,10 +12,11 @@
     <input type="submit" value="Register" />
 
     {% if error %}
-      <p class="error"><strong>Error:</strong> {{ error }}</p>
+    <p class="error"><strong>Error:</strong> {{ error }}</p>
     {% endif %}
   </form>
 
   <a href="/">Go back</a>
 </body>
+
 </html>

@@ -1,0 +1,36 @@
+ html,
+ body {
+     height: 100%;
+     margin: 0;
+ }
+
+ body {
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+     font-family: Arial, sans-serif;
+     background-color: aliceblue;
+ }
+
+ form {
+     display: flex;
+     flex-direction: column;
+     align-items: stretch;
+     gap: 10px;
+     min-width: 260px;
+ }
+
+ form input {
+     padding: 6px 8px;
+ }
+
+ .error {
+     margin-top: 6px;
+     color: red;
+     font-size: 0.9rem;
+ }
+
+ a {
+     margin-top: 16px;
+ }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 07, 2025 at 06:23 AM
+-- Generation Time: Dec 08, 2025 at 02:59 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -79,11 +79,12 @@ CREATE TABLE `airline_staff` (
 --
 
 INSERT INTO `airline_staff` (`username`, `password`, `first_name`, `last_name`, `date_of_birth`, `airline_name`) VALUES
-('jane_sj', 'staffpassword', 'Jane', 'Doe', '1990-03-14', 'United'),
-('kate_american', 'pwdk', 'Kate', 'Johnson', '1982-02-20', 'American'),
-('oliver_ba', 'pwdo', 'Oliver', 'Miller', '1987-03-28', 'British Airways'),
-('sam_delta', 'pwds', 'Sam', 'Turner', '1985-07-11', 'Delta'),
-('yuji_ana', 'pwdy', 'Yuji', 'Sato', '1991-09-09', 'ANA');
+('jane_sj', 'scrypt:32768:8:1$aCM2E3d78RFP1Pwu$1eab600cd1ef289c0694f1eeaa1bb5931a8cbd843182a96820ddce4257d740cff9fd0ddcda1529d11d15d15c38beafeebc75f48572e4925df2f4c77f5be2034f', 'Jane', 'Doe', '1990-03-14', 'United'),
+('kate_american', 'scrypt:32768:8:1$fq4bbIN8cJadMQZW$9a0f32b744bb7322c0ec41aeded22b36d87a6ff7d318d18e53a6860dc426ad9433ea13bea7fc533e3d19988fd287ae8f34c4b35e749ee797a4d5b1c379a32a3d', 'Kate', 'Johnson', '1982-02-20', 'American'),
+('mickey_sd', 'scrypt:32768:8:1$vgZwTUb0dLVAUfP1$1d066d560a6b5b1d8f5c1edb6ddd0f902cc322e029f5e1ea7b9316cdaf48c90f86bb70243fa2d57e56f821197707bb34057b39cca5f7070d1c6cdb7bf2442c9f', NULL, NULL, NULL, 'United'),
+('oliver_ba', 'scrypt:32768:8:1$hL0lMefKZVCJ0D2v$c45e95fe583dd898b35ac36fea9932caf9d3db204dca090ca94af6af1e80a81dc73d2fc925580a927591a08a24712144034ba3582f723a6ac642922559165861', 'Oliver', 'Miller', '1987-03-28', 'British Airways'),
+('sam_delta', 'scrypt:32768:8:1$VcdpJS9JsAFhztRO$514a113ea79385b1f07b6e7a82a89839053cd46d14102827ac80e89075c13a2479e5b9db9c20b4c978d982770c19851d5e0982eb2899c77846f88e07039f44f5', 'Sam', 'Turner', '1985-07-11', 'Delta'),
+('yuji_ana', 'scrypt:32768:8:1$eRzvVVzgUlk191mp$2cf3ef3fe0c87f09bd3a614a814515112f6a51858fc7aa2b63d5f2b61a27afd68a2ddd7df081a303cd9299da7771de7ce64704ab7ede3a3e3a294f9041a55326', 'Yuji', 'Sato', '1991-09-09', 'ANA');
 
 -- --------------------------------------------------------
 
@@ -111,7 +112,8 @@ INSERT INTO `airplane` (`airline_name`, `id`, `seat_capacity`) VALUES
 ('Delta', 1, 190),
 ('Delta', 2, 250),
 ('United', 1, 180),
-('United', 2, 220);
+('United', 2, 220),
+('United', 4, 300);
 
 -- --------------------------------------------------------
 
@@ -132,6 +134,7 @@ INSERT INTO `airport` (`name`, `city`) VALUES
 ('LHR', 'London'),
 ('LAX', 'Los Angeles'),
 ('JFK', 'New York'),
+('LGA', 'New York'),
 ('PVG', 'Shanghai'),
 ('NRT', 'Tokyo');
 
@@ -154,7 +157,8 @@ INSERT INTO `authorized_by` (`agent_email`, `airline_name`) VALUES
 ('agent1@gmail.com', 'United'),
 ('agent2@gmail.com', 'Delta'),
 ('agent3@gmail.com', 'ANA'),
-('agent3@gmail.com', 'British Airways');
+('agent3@gmail.com', 'British Airways'),
+('random_agent@gmail.com', 'United');
 
 -- --------------------------------------------------------
 
@@ -172,9 +176,10 @@ CREATE TABLE `booking_agent` (
 --
 
 INSERT INTO `booking_agent` (`email`, `password`) VALUES
-('agent1@gmail.com', 'agentpassword'),
-('agent2@gmail.com', 'pass2'),
-('agent3@gmail.com', 'pass3');
+('agent1@gmail.com', 'scrypt:32768:8:1$FcVGRL22PAQb3haI$3387f80fcaf71806b5c73ba5de24ab15e37868544cd71dad368a79508564c16b6ee03c95d648f39e592b01196839e344a6b10be729ced9e3aee633bf292effba'),
+('agent2@gmail.com', 'scrypt:32768:8:1$O3LCzf0M00w0YTct$18ceb8aada590d724eed24c881f2b99e56552f3757d0eac28e117a9e720cf72d67f2c318c8758064819f9e68bc514eccba367d58801b46fccb173ab838d9a8b2'),
+('agent3@gmail.com', 'scrypt:32768:8:1$kYrbvVkANybYElY4$69210eb4ed6b22613621d4596e7b693440b2c9afe7e29623f0c234d3f04d4ff7be46a3b05bd2d0fdfdd9db3aa7fe406aab89c49c5f9b1d712bf1fefb82a33d01'),
+('random_agent@gmail.com', 'scrypt:32768:8:1$HGgjCVgnRZwn9TfW$9c92962114692950f535a8d93887e8a95edfa70039aaa2157495576fa933d3c17cb3d3a0c1c0f19a02fa0b973bf3ef87e7f0df29d735cacea6e199e9ae8925fa');
 
 -- --------------------------------------------------------
 
@@ -187,10 +192,10 @@ CREATE TABLE `browse_flights` (
 ,`flight_num` varchar(100)
 ,`departure_airport` varchar(100)
 ,`departure_city` varchar(100)
-,`departure_time` varchar(100)
+,`departure_time` datetime
 ,`arrival_airport` varchar(100)
 ,`arrival_city` varchar(100)
-,`arrival_time` varchar(100)
+,`arrival_time` datetime
 ,`price` decimal(10,2)
 ,`status` varchar(20)
 ,`airplane_id` int(11)
@@ -269,13 +274,13 @@ CREATE TABLE `customer` (
 --
 
 INSERT INTO `customer` (`email`, `name`, `password`, `building`, `street`, `city`, `state`, `phone_number`, `passport_number`, `passport_expiration_date`, `passport_country`, `date_of_birth`) VALUES
-('drake@gmail.com', 'Drake', 'pwdd', NULL, NULL, NULL, NULL, '416-555-1515', 'P99903', '2031-01-01', 'Canada', '1986-10-24'),
-('emmawatson@gmail.com', 'Emma Watson', 'pwde', NULL, NULL, NULL, NULL, '020-555-2020', 'P99904', '2033-03-03', 'UK', '1990-04-15'),
-('rihanna@gmail.com', 'Rihanna', 'pwdr', NULL, NULL, NULL, NULL, '310-555-1212', 'P99902', '2032-08-14', 'Barbados', '1988-02-20'),
-('sabrinacarpenter@gmail.com', 'Sabrina Carpenter', 'password3', NULL, NULL, NULL, NULL, '646-555-3333', 'P54321', '2032-04-01', 'USA', '1999-05-11'),
-('selenagomez@gmail.com', 'Selena Gomez', 'password2', NULL, NULL, NULL, NULL, '917-555-2222', 'P67890', '2031-01-15', 'USA', '1992-07-22'),
-('taylorswift@gmail.com', 'Taylor Swift', 'password1', NULL, NULL, NULL, NULL, '123-456-7891', 'P12345', '2030-05-10', 'USA', '1989-12-13'),
-('zendaya@gmail.com', 'Zendaya', 'pwdz', NULL, NULL, NULL, NULL, '212-555-1111', 'P99901', '2030-06-10', 'USA', '1996-09-01');
+('drake@gmail.com', 'Drake', 'scrypt:32768:8:1$jwmTpkxI2eEtAq8P$fa318b348dc02c9afe5695a25d6cf20b947a9f33a4a0f584cf20e8472656b2807e404db99d741f2271e9b64e6794df25821b525e6bab115973c39045cd3faa05', NULL, NULL, NULL, NULL, '416-555-1515', 'P99903', '2031-01-01', 'Canada', '1986-10-24'),
+('emmawatson@gmail.com', 'Emma Watson', 'scrypt:32768:8:1$G9XVPynl1mNqablI$f0da87c444cd21d8f4a1ee5e514c63a10c26e4dfc2bc71af22f7f62522b83822c5a267db6aee58e72baa61d31d423246a0308c4ff29c8ce25d992dd1b94666ca', NULL, NULL, NULL, NULL, '020-555-2020', 'P99904', '2033-03-03', 'UK', '1990-04-15'),
+('rihanna@gmail.com', 'Rihanna', 'scrypt:32768:8:1$CdhU8TdFg4BxChtA$36fe3e501e50fac62b8b267e9000bc831b5ad2f6f521648dba53b89d5277d32784cd9df59b6ae0326c4893353f431cad791bff690a003293455b16b087ec0975', NULL, NULL, NULL, NULL, '310-555-1212', 'P99902', '2032-08-14', 'Barbados', '1988-02-20'),
+('sabrinacarpenter@gmail.com', 'Sabrina Carpenter', 'scrypt:32768:8:1$AyP8ImWeVI7QwdQq$d72c8f794882430c36b5041a76258dd94395d8546d5d93398cc95076944f9922645313c783370be1f63846e14e1d5d4d31027db2c42107b6b0a48169593fd2d8', NULL, NULL, NULL, NULL, '646-555-3333', 'P54321', '2032-04-01', 'USA', '1999-05-11'),
+('selenagomez@gmail.com', 'Selena Gomez', 'scrypt:32768:8:1$b2VyVnDD6cSvzEiX$1764ab1ed07dd8cdfad2b2309563088c03f0d7a78867388a5cfec21110a0f6b7f76545478bcaf05fb066d52fa12fc9f9e94a981501f8dace43249d31cf139419', NULL, NULL, NULL, NULL, '917-555-2222', 'P67890', '2031-01-15', 'USA', '1992-07-22'),
+('taylorswift@gmail.com', 'Taylor Swift', 'scrypt:32768:8:1$7FJoOq7tWBlc2dZp$0f80ed7edd2b78e4b804d5f4e85871a68dd098b56588914fb713c8e47eeeeb7674afbbef8b8e565c2032ff44ef8084f3c0b7ed35ad1d26a8babd3be9541195dd', NULL, NULL, NULL, NULL, '123-456-7891', 'P12345', '2030-05-10', 'USA', '1989-12-13'),
+('zendaya@gmail.com', 'Zendaya', 'scrypt:32768:8:1$xTnDsgDSGN6p2NR1$3216e233adf3e1aa1095324465166bab3390e3542a2a15600b4517ecf329e4422253460f3d4abd610271982c90585a3d88d7722c88ed6046b1ced78b32b9e7d6', NULL, NULL, NULL, NULL, '212-555-1111', 'P99901', '2030-06-10', 'USA', '1996-09-01');
 
 -- --------------------------------------------------------
 
@@ -286,8 +291,8 @@ INSERT INTO `customer` (`email`, `name`, `password`, `building`, `street`, `city
 CREATE TABLE `customers_list_for_flight` (
 `airline_name` varchar(100)
 ,`flight_num` varchar(100)
-,`departure_time` varchar(100)
-,`arrival_time` varchar(100)
+,`departure_time` datetime
+,`arrival_time` datetime
 ,`ticket_id` int(11)
 ,`purchase_date` date
 ,`booking_agent_email` varchar(100)
@@ -317,41 +322,42 @@ CREATE TABLE `customer_analytics` (
 CREATE TABLE `flight` (
   `flight_num` varchar(100) NOT NULL,
   `airline_name` varchar(100) NOT NULL,
-  `departure_time` varchar(100) NOT NULL,
-  `arrival_time` varchar(100) NOT NULL,
+  `departure_time` datetime DEFAULT NULL,
+  `arrival_time` datetime DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
-  `status` varchar(20) NOT NULL CHECK (`status` in ('upcoming','in-progress','delayed')),
   `airplane_id` int(11) NOT NULL,
   `departure_airport` varchar(100) NOT NULL,
-  `arrival_airport` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `arrival_airport` varchar(100) NOT NULL,
+  `status` varchar(20) NOT NULL
+) ;
 
 --
 -- Dumping data for table `flight`
 --
 
-INSERT INTO `flight` (`flight_num`, `airline_name`, `departure_time`, `arrival_time`, `price`, `status`, `airplane_id`, `departure_airport`, `arrival_airport`) VALUES
-('AA300', 'American', '2025-10-10 09:00', '2025-10-10 17:00', 500.00, 'delayed', 1, 'LAX', 'LHR'),
-('AA301', 'American', '2025-10-18 22:00', '2025-10-19 01:30', 250.00, 'upcoming', 2, 'LHR', 'LAX'),
-('AA400', 'American', '2026-05-11 10:00', '2026-05-11 17:45', 520.00, 'upcoming', 1, 'LAX', 'LHR'),
-('AA401', 'American', '2026-06-21 21:00', '2026-06-22 01:25', 260.00, 'upcoming', 2, 'LHR', 'LAX'),
-('BA400', 'British Airways', '2025-08-30 07:30', '2025-08-30 11:30', 420.00, 'upcoming', 1, 'LHR', 'JFK'),
-('BA401', 'British Airways', '2025-08-17 13:00', '2025-08-17 17:00', 440.00, 'delayed', 2, 'JFK', 'LHR'),
-('BA500', 'British Airways', '2026-07-05 07:00', '2026-07-05 11:10', 430.00, 'upcoming', 1, 'LHR', 'JFK'),
-('BA501', 'British Airways', '2026-07-19 13:00', '2026-07-19 17:05', 450.00, 'upcoming', 2, 'JFK', 'LHR'),
-('DL200', 'Delta', '2025-11-05 07:00', '2025-11-05 15:30', 650.00, 'upcoming', 1, 'LAX', 'JFK'),
-('DL201', 'Delta', '2025-11-08 12:15', '2025-11-09 06:45', 900.00, 'in-progress', 2, 'JFK', 'NRT'),
-('DL300', 'Delta', '2026-01-18 06:00', '2026-01-18 14:30', 700.00, 'upcoming', 1, 'LAX', 'JFK'),
-('DL301', 'Delta', '2026-02-05 13:15', '2026-02-06 09:20', 980.00, 'upcoming', 2, 'JFK', 'NRT'),
-('NH100', 'ANA', '2025-09-22 14:00', '2025-09-22 22:00', 850.00, 'in-progress', 1, 'NRT', 'PVG'),
-('NH101', 'ANA', '2025-09-23 08:00', '2025-09-23 16:20', 880.00, 'upcoming', 2, 'PVG', 'NRT'),
-('NH200', 'ANA', '2026-03-03 09:00', '2026-03-03 17:00', 870.00, 'upcoming', 1, 'NRT', 'PVG'),
-('NH201', 'ANA', '2026-03-04 08:00', '2026-03-04 16:00', 900.00, 'upcoming', 2, 'PVG', 'NRT'),
-('UA100', 'United', '2025-10-12 08:00', '2025-10-12 20:00', 850.00, 'upcoming', 1, 'JFK', 'PVG'),
-('UA101', 'United', '2025-10-09 06:30', '2025-10-09 10:45', 180.00, 'in-progress', 2, 'PVG', 'JFK'),
-('UA102', 'United', '2025-10-08 09:00', '2025-10-08 13:30', 190.00, 'delayed', 1, 'JFK', 'PVG'),
-('UA200', 'United', '2026-03-10 07:30', '2026-03-10 15:00', 820.00, 'upcoming', 1, 'JFK', 'PVG'),
-('UA201', 'United', '2026-04-02 12:00', '2026-04-02 18:10', 210.00, 'upcoming', 2, 'PVG', 'JFK');
+INSERT INTO `flight` (`flight_num`, `airline_name`, `departure_time`, `arrival_time`, `price`, `airplane_id`, `departure_airport`, `arrival_airport`, `status`) VALUES
+('AA300', 'American', '2025-10-10 09:00:00', '2025-10-10 17:00:00', 500.00, 1, 'LAX', 'LHR', 'delayed'),
+('AA301', 'American', '2025-10-18 22:00:00', '2025-10-19 01:30:00', 250.00, 2, 'LHR', 'LAX', 'completed'),
+('AA400', 'American', '2026-05-11 10:00:00', '2026-05-11 17:45:00', 520.00, 1, 'LAX', 'LHR', 'upcoming'),
+('AA401', 'American', '2026-06-21 21:00:00', '2026-06-22 01:25:00', 260.00, 2, 'LHR', 'LAX', 'upcoming'),
+('BA400', 'British Airways', '2025-08-30 07:30:00', '2025-08-30 11:30:00', 420.00, 1, 'LHR', 'JFK', 'completed'),
+('BA401', 'British Airways', '2025-08-17 13:00:00', '2025-08-17 17:00:00', 440.00, 2, 'JFK', 'LHR', 'delayed'),
+('BA500', 'British Airways', '2026-07-05 07:00:00', '2026-07-05 11:10:00', 430.00, 1, 'LHR', 'JFK', 'upcoming'),
+('BA501', 'British Airways', '2026-07-19 13:00:00', '2026-07-19 17:05:00', 450.00, 2, 'JFK', 'LHR', 'upcoming'),
+('DL200', 'Delta', '2025-11-05 07:00:00', '2025-11-05 15:30:00', 650.00, 1, 'LAX', 'JFK', 'completed'),
+('DL201', 'Delta', '2025-11-08 12:15:00', '2025-11-09 06:45:00', 900.00, 2, 'JFK', 'NRT', 'in-progress'),
+('DL300', 'Delta', '2026-01-18 06:00:00', '2026-01-18 14:30:00', 700.00, 1, 'LAX', 'JFK', 'upcoming'),
+('DL301', 'Delta', '2026-02-05 13:15:00', '2026-02-06 09:20:00', 980.00, 2, 'JFK', 'NRT', 'upcoming'),
+('NH100', 'ANA', '2025-09-22 14:00:00', '2025-09-22 22:00:00', 850.00, 1, 'NRT', 'PVG', 'in-progress'),
+('NH101', 'ANA', '2025-09-23 08:00:00', '2025-09-23 16:20:00', 880.00, 2, 'PVG', 'NRT', 'completed'),
+('NH200', 'ANA', '2026-03-03 09:00:00', '2026-03-03 17:00:00', 870.00, 1, 'NRT', 'PVG', 'upcoming'),
+('NH201', 'ANA', '2026-03-04 08:00:00', '2026-03-04 16:00:00', 900.00, 2, 'PVG', 'NRT', 'upcoming'),
+('UA100', 'United', '2025-10-12 08:00:00', '2025-10-12 20:00:00', 850.00, 1, 'JFK', 'PVG', 'completed'),
+('UA101', 'United', '2025-10-09 06:30:00', '2025-10-09 10:45:00', 180.00, 2, 'PVG', 'JFK', 'in-progress'),
+('UA102', 'United', '2025-10-08 09:00:00', '2025-10-08 13:30:00', 190.00, 1, 'JFK', 'PVG', 'delayed'),
+('UA200', 'United', '2026-03-10 07:30:00', '2026-03-10 15:00:00', 820.00, 1, 'JFK', 'PVG', 'upcoming'),
+('UA201', 'United', '2026-04-02 12:00:00', '2026-04-02 18:10:00', 210.00, 2, 'PVG', 'JFK', 'upcoming'),
+('UA202', 'United', '2025-12-22 13:03:00', '2025-12-22 19:23:00', 450.00, 2, 'LGA', 'LAX', 'upcoming');
 
 -- --------------------------------------------------------
 
@@ -364,10 +370,10 @@ CREATE TABLE `in_progress_flights` (
 ,`flight_num` varchar(100)
 ,`departure_airport` varchar(100)
 ,`departure_city` varchar(100)
-,`departure_time` varchar(100)
+,`departure_time` datetime
 ,`arrival_airport` varchar(100)
 ,`arrival_city` varchar(100)
-,`arrival_time` varchar(100)
+,`arrival_time` datetime
 ,`price` decimal(10,2)
 ,`status` varchar(20)
 ,`airplane_id` int(11)
@@ -384,10 +390,10 @@ CREATE TABLE `next_30_days_flights` (
 ,`flight_num` varchar(100)
 ,`departure_airport` varchar(100)
 ,`departure_city` varchar(100)
-,`departure_time` varchar(100)
+,`departure_time` datetime
 ,`arrival_airport` varchar(100)
 ,`arrival_city` varchar(100)
-,`arrival_time` varchar(100)
+,`arrival_time` datetime
 ,`price` decimal(10,2)
 ,`status` varchar(20)
 ,`airplane_id` int(11)
@@ -404,10 +410,10 @@ CREATE TABLE `past_flights` (
 ,`flight_num` varchar(100)
 ,`departure_airport` varchar(100)
 ,`departure_city` varchar(100)
-,`departure_time` varchar(100)
+,`departure_time` datetime
 ,`arrival_airport` varchar(100)
 ,`arrival_city` varchar(100)
-,`arrival_time` varchar(100)
+,`arrival_time` datetime
 ,`price` decimal(10,2)
 ,`status` varchar(20)
 ,`airplane_id` int(11)
@@ -433,6 +439,7 @@ INSERT INTO `permission` (`permission_type`, `airline_staff_username`) VALUES
 ('operator', 'jane_sj'),
 ('admin', 'kate_american'),
 ('operator', 'kate_american'),
+('admin', 'mickey_sd'),
 ('admin', 'oliver_ba'),
 ('admin', 'sam_delta'),
 ('operator', 'sam_delta'),
@@ -454,10 +461,10 @@ CREATE TABLE `purchased_flights` (
 ,`flight_num` varchar(100)
 ,`departure_airport` varchar(100)
 ,`departure_city` varchar(100)
-,`departure_time` varchar(100)
+,`departure_time` datetime
 ,`arrival_airport` varchar(100)
 ,`arrival_city` varchar(100)
-,`arrival_time` varchar(100)
+,`arrival_time` datetime
 ,`price` decimal(10,2)
 ,`status` varchar(20)
 ,`airplane_id` int(11)
@@ -495,6 +502,7 @@ INSERT INTO `purchases` (`ticket_id`, `customer_email`, `booking_agent_email`, `
 (2007, 'drake@gmail.com', NULL, '2025-08-20'),
 (2008, 'rihanna@gmail.com', 'agent3@gmail.com', '2025-08-21'),
 (2199, 'drake@gmail.com', NULL, '2025-12-04'),
+(2743, 'drake@gmail.com', NULL, '2025-12-08'),
 (3001, 'taylorswift@gmail.com', 'agent1@gmail.com', '2026-02-25'),
 (3002, 'selenagomez@gmail.com', NULL, '2026-03-15'),
 (3003, 'zendaya@gmail.com', 'agent2@gmail.com', '2026-01-05'),
@@ -509,6 +517,8 @@ INSERT INTO `purchases` (`ticket_id`, `customer_email`, `booking_agent_email`, `
 (3740, 'rihanna@gmail.com', NULL, '2025-12-04'),
 (4108, 'rihanna@gmail.com', NULL, '2025-12-04'),
 (4304, 'drake@gmail.com', NULL, '2025-12-04'),
+(4929, 'drake@gmail.com', NULL, '2025-12-08'),
+(5057, 'emmawatson@gmail.com', 'agent1@gmail.com', '2025-12-08'),
 (5116, 'rihanna@gmail.com', NULL, '2025-12-04'),
 (5165, 'rihanna@gmail.com', NULL, '2025-12-04'),
 (5600, 'drake@gmail.com', NULL, '2025-12-04'),
@@ -518,7 +528,8 @@ INSERT INTO `purchases` (`ticket_id`, `customer_email`, `booking_agent_email`, `
 (7153, 'drake@gmail.com', NULL, '2025-12-04'),
 (8101, 'rihanna@gmail.com', NULL, '2025-12-04'),
 (9042, 'rihanna@gmail.com', NULL, '2025-12-04'),
-(9072, 'rihanna@gmail.com', NULL, '2025-12-04');
+(9072, 'rihanna@gmail.com', NULL, '2025-12-04'),
+(9692, 'emmawatson@gmail.com', 'agent1@gmail.com', '2025-12-08');
 
 -- --------------------------------------------------------
 
@@ -561,10 +572,10 @@ CREATE TABLE `staff_analytics` (
 ,`flight_num` varchar(100)
 ,`departure_airport` varchar(100)
 ,`departure_city` varchar(100)
-,`departure_time` varchar(100)
+,`departure_time` datetime
 ,`arrival_airport` varchar(100)
 ,`arrival_city` varchar(100)
-,`arrival_time` varchar(100)
+,`arrival_time` datetime
 ,`price` decimal(10,2)
 ,`status` varchar(20)
 ,`airplane_id` int(11)
@@ -633,7 +644,11 @@ INSERT INTO `ticket` (`ticket_id`, `flight_num`, `airline_name`) VALUES
 (1002, 'UA101', 'United'),
 (1003, 'UA102', 'United'),
 (3001, 'UA200', 'United'),
-(3002, 'UA201', 'United');
+(2743, 'UA201', 'United'),
+(3002, 'UA201', 'United'),
+(4929, 'UA201', 'United'),
+(5057, 'UA201', 'United'),
+(9692, 'UA201', 'United');
 
 -- --------------------------------------------------------
 
@@ -642,7 +657,9 @@ INSERT INTO `ticket` (`ticket_id`, `flight_num`, `airline_name`) VALUES
 -- (See below for the actual view)
 --
 CREATE TABLE `top_destinations` (
-`airline_name` varchar(100)
+`Month` int(2)
+,`Year` int(4)
+,`airline_name` varchar(100)
 ,`destination_airport` varchar(100)
 ,`destination_city` varchar(100)
 ,`tickets_sold` bigint(21)
@@ -659,10 +676,10 @@ CREATE TABLE `upcoming_flights` (
 ,`flight_num` varchar(100)
 ,`departure_airport` varchar(100)
 ,`departure_city` varchar(100)
-,`departure_time` varchar(100)
+,`departure_time` datetime
 ,`arrival_airport` varchar(100)
 ,`arrival_city` varchar(100)
-,`arrival_time` varchar(100)
+,`arrival_time` datetime
 ,`price` decimal(10,2)
 ,`status` varchar(20)
 ,`airplane_id` int(11)
@@ -684,7 +701,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `browse_flights`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `browse_flights`  AS SELECT `uf`.`airline_name` AS `airline_name`, `uf`.`flight_num` AS `flight_num`, `uf`.`departure_airport` AS `departure_airport`, `uf`.`departure_city` AS `departure_city`, `uf`.`departure_time` AS `departure_time`, `uf`.`arrival_airport` AS `arrival_airport`, `uf`.`arrival_city` AS `arrival_city`, `uf`.`arrival_time` AS `arrival_time`, `uf`.`price` AS `price`, `uf`.`status` AS `status`, `uf`.`airplane_id` AS `airplane_id`, `a`.`seat_capacity`- count(`t`.`ticket_id`) AS `available_seats` FROM ((`upcoming_flights` `uf` join `airplane` `a` on(`uf`.`airplane_id` = `a`.`id` and `uf`.`airline_name` = `a`.`airline_name`)) join (`ticket` `t` join `purchases` `p` on(`t`.`ticket_id` = `p`.`ticket_id`)) on(`uf`.`flight_num` = `t`.`flight_num`)) GROUP BY `uf`.`flight_num` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `browse_flights`  AS SELECT `uf`.`airline_name` AS `airline_name`, `uf`.`flight_num` AS `flight_num`, `uf`.`departure_airport` AS `departure_airport`, `uf`.`departure_city` AS `departure_city`, `uf`.`departure_time` AS `departure_time`, `uf`.`arrival_airport` AS `arrival_airport`, `uf`.`arrival_city` AS `arrival_city`, `uf`.`arrival_time` AS `arrival_time`, `uf`.`price` AS `price`, `uf`.`status` AS `status`, `uf`.`airplane_id` AS `airplane_id`, `a`.`seat_capacity`- count(`t`.`ticket_id`) AS `available_seats` FROM ((`upcoming_flights` `uf` join `airplane` `a` on(`uf`.`airplane_id` = `a`.`id` and `uf`.`airline_name` = `a`.`airline_name`)) left join `ticket` `t` on(`uf`.`flight_num` = `t`.`flight_num`)) GROUP BY `uf`.`flight_num` HAVING `available_seats` > 0 ;
 
 -- --------------------------------------------------------
 
@@ -774,7 +791,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `top_destinations`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `top_destinations`  AS SELECT `t`.`airline_name` AS `airline_name`, `f`.`arrival_airport` AS `destination_airport`, `a_arr`.`city` AS `destination_city`, count(0) AS `tickets_sold` FROM (((`purchases` `p` join `ticket` `t` on(`p`.`ticket_id` = `t`.`ticket_id`)) join `flight` `f` on(`t`.`airline_name` = `f`.`airline_name` and `t`.`flight_num` = `f`.`flight_num`)) join `airport` `a_arr` on(`f`.`arrival_airport` = `a_arr`.`name`)) GROUP BY `t`.`airline_name`, `f`.`arrival_airport`, `a_arr`.`city` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `top_destinations`  AS SELECT month(`p`.`purchase_date`) AS `Month`, year(`p`.`purchase_date`) AS `Year`, `t`.`airline_name` AS `airline_name`, `f`.`arrival_airport` AS `destination_airport`, `a_arr`.`city` AS `destination_city`, count(0) AS `tickets_sold` FROM (((`purchases` `p` join `ticket` `t` on(`p`.`ticket_id` = `t`.`ticket_id`)) join `flight` `f` on(`t`.`airline_name` = `f`.`airline_name` and `t`.`flight_num` = `f`.`flight_num`)) join `airport` `a_arr` on(`f`.`arrival_airport` = `a_arr`.`name`)) GROUP BY month(`p`.`purchase_date`), year(`p`.`purchase_date`), `t`.`airline_name`, `f`.`arrival_airport`, `a_arr`.`city` ;
 
 -- --------------------------------------------------------
 

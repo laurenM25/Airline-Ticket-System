@@ -13,35 +13,77 @@
 </head>
 
 <body>
-    <div class="basicHomeFuncs">
-        <a class='page-link' href="/upcomingFlights">Check out upcoming flights</a>
-        <a class='page-link' href="/home">Go Home</a>
-        <a class='logout-link' href="/logout">log out</a>
-    </div>
-
-    <div>
-        <input type="date" id="filter-start-date" placeholder="Start date"
-            value="{{ start_date.strftime('%Y-%m-%d') }}">
-        <input type="date" id="filter-end-date" placeholder="End date" value="{{ end_date.strftime('%Y-%m-%d') }}">
-    </div>
-    <div>
-        <div class="table-view">
-
-            <table id="myTable">
-                <tr>
-                    <th>purchase date</th>
-                    <th>ticket price</th>
-                </tr>
-
-                {% for row in table %}
-                <tr>
-                    {% for col in row %}
-                    <td>{{col}}</td>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </table>
+    <div class="topBar">
+        <div class="left-top"></div>
+        <div class="center-top">
+            <span class="webpage-title">Air Ticket Reservation </span>
         </div>
+        <div class="right-top">
+            <span class="username">Welcome {{username}}</span>
+            <a class='logout-link' href="/logout">log out</a>
+        </div>
+    </div>
+    <div class="sideNav">
+        <h3>Tools</h3>
+        {% if usertype %}
+        {% if usertype == "customer" %}
+        <a class='page-link' href="/browseFlights">Browse Flights</a>
+        <a class='page-link' href="/purchasedFlights">View purchased flights</a>
+        <a class='page-link' href="/spendingStats">View spending stats</a>
+        {% endif %}
+
+        {% if usertype == "agent" %}
+        <a class='page-link' href="/purchasedFlightsA">View flights purchased for clients</a>
+        <a class='page-link' href="/browseFlightsA">Browse flights</a>
+        <a class='page-link' href="/analyticsA">Analytics</a>
+        {% endif %}
+
+        {% if usertype == "airline_staff" %}
+        <a class='page-link' href="/upcomingFlightsStaff">View upcoming flights for your airline</a>
+        <a class='page-link' href="/passengerList">Check passenger list by flight number</a>
+        <a class='page-link' href="/customersFlights">Look up flights taken by a customer</a>
+        <a class='page-link' href="/analyticsStaff">Analytics</a>
+        {% endif %}
+
+        {% endif %}
+
+        {% if specialperm %}
+        {% if "admin" in specialperm %}
+        <h3>Admin Tools</h3>
+        <a class='page-link' href="/addAirport">Add new airport</a>
+        <a class='page-link' href="/addAirplane">Add new airplane</a>
+        <a class='page-link' href="/createFlight">Create flight</a>
+        <a class='page-link' href="/assignAgent">Assign agent to airline</a>
+        {% endif %}
+
+        {% if "operator" in specialperm %}
+        <h3>Operator Tools</h3>
+        <a class='page-link' href="/updateStatus">Update flight status</a>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="main-content">
+        <div>
+            <input type="date" id="filter-start-date" placeholder="Start date"
+                value="{{ start_date.strftime('%Y-%m-%d') }}">
+            <input type="date" id="filter-end-date" placeholder="End date" value="{{ end_date.strftime('%Y-%m-%d') }}">
+        </div>
+
+        <table id="myTable">
+            <tr>
+                <th>purchase date</th>
+                <th>ticket price</th>
+            </tr>
+
+            {% for row in table %}
+            <tr>
+                {% for col in row %}
+                <td>{{col}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
         <div>
             <!-- using Chart.js to make bar chart -->
             <canvas id="barChart" style="width:100%;max-width:700px"></canvas>
@@ -49,72 +91,70 @@
         <div>
             <a href="/spendingStats">Back to default view</a>
         </div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-
-        <script>
-            const ctx = document.getElementById('barChart');
-
-            const barChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: monthlyLabels,
-                    datasets: [{
-                        backgroundColor: "steelblue",
-                        data: monthlyValues
-                    }]
-                },
-                options: {
-                    title: {
-                        display: true,
-                        text: "Monthly Spending"
-                    }
-                }
-            });
-
-            // on update of time range filter...
-            async function fetchSpendingData() {
-                const start = document.getElementById("filter-start-date").value;
-                const end = document.getElementById("filter-end-date").value;
-
-                const url = `/spendingStats/data?start=${start}&end=${end}`;
-                const response = await fetch(url);
-                const data = await response.json();
-
-                updateTable(data.rows);
-                updateChart(data.monthly_labels, data.monthly_values);
-            }
-            //update table presented on the page
-            function updateTable(rows) {
-                const table = document.getElementById("myTable");
-
-                // remove old data rows
-                while (table.rows.length > 1) {
-                    table.deleteRow(1);
-                }
-
-                // insert new rows
-                for (const r of rows) {
-                    const row = table.insertRow();
-                    row.insertCell().innerText = r[0];
-                    row.insertCell().innerText = r[1];
-                }
-            }
-
-            // update chart
-            function updateChart(labels, values) {
-                barChart.data.labels = labels;
-                barChart.data.datasets[0].data = values;
-                barChart.update();
-            }
-
-            // listen for changes to start and end range filters, trigger fetchSpendingData if activated
-            document.getElementById("filter-start-date").addEventListener("input", fetchSpendingData);
-            document.getElementById("filter-end-date").addEventListener("input", fetchSpendingData);
-
-        </script>
-
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 
+    <script>
+        const ctx = document.getElementById('barChart');
+
+        const barChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    backgroundColor: "steelblue",
+                    data: monthlyValues
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "Monthly Spending"
+                }
+            }
+        });
+
+        // on update of time range filter...
+        async function fetchSpendingData() {
+            const start = document.getElementById("filter-start-date").value;
+            const end = document.getElementById("filter-end-date").value;
+
+            const url = `/spendingStats/data?start=${start}&end=${end}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            updateTable(data.rows);
+            updateChart(data.monthly_labels, data.monthly_values);
+        }
+        //update table presented on the page
+        function updateTable(rows) {
+            const table = document.getElementById("myTable");
+
+            // remove old data rows
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            // insert new rows
+            for (const r of rows) {
+                const row = table.insertRow();
+                row.insertCell().innerText = r[0];
+                row.insertCell().innerText = r[1];
+            }
+        }
+
+        // update chart
+        function updateChart(labels, values) {
+            barChart.data.labels = labels;
+            barChart.data.datasets[0].data = values;
+            barChart.update();
+        }
+
+        // listen for changes to start and end range filters, trigger fetchSpendingData if activated
+        document.getElementById("filter-start-date").addEventListener("input", fetchSpendingData);
+        document.getElementById("filter-end-date").addEventListener("input", fetchSpendingData);
+
+    </script>
 </body>
 
 </html>

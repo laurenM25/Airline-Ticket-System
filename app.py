@@ -20,6 +20,8 @@ from views import topCustomer_byTickets, topCustomer_byCommission, commission_to
 app = Flask(__name__)
 app.secret_key = "yeah a secret key"
 
+def user_spec_type(): #returns user_type and special_perm from session variable
+    return session.get("user_type"), session.get("special_perm")
 
 #Define a route to hello function
 @app.route('/')
@@ -32,8 +34,7 @@ def hello():
 def home():
     if 'username' not in session:
         return render_template('index.html')
-    
-    return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"),username=session.get("username"))
+    return render_template('home.html', username=session.get("username"))
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -182,8 +183,9 @@ General pages, anyone can access -->
 @app.route('/upcomingFlights')
 def upcomingFlights():
     isLoggedIn = 'username' in session
+    userType, specPerm = user_spec_type()
 
-    if session.get("user_type") == "airline_staff":
+    if userType == "airline_staff":
         return redirect(url_for('upcomingFlightsStaff'))
     
     return render_template('upcomingFlights.html',table=upcomingFlightsView(),isLoggedIn=isLoggedIn)
@@ -191,8 +193,9 @@ def upcomingFlights():
 @app.route('/flightStatus', methods=['GET', 'POST'])
 def inProgressFlights():
     isLoggedIn = 'username' in session
+    userType, specPerm = user_spec_type()
 
-    if session.get("user_type") == "airline_staff":
+    if userType == "airline_staff":
         return redirect(url_for('upcomingFlightsStaff'))
     
     #to get flight status after user inputs airline and flight number
@@ -258,7 +261,7 @@ def browseToPurchase():
     elif session.get("user_type") != 'customer':
         if session.get("user_type") == 'agent':
             return redirect(url_for('browseFlightsAgent'))
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
     
     table = return_view('browse_flights')
     return render_template('browse-customer.html',table=table)
@@ -268,7 +271,7 @@ def customerCheckout():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'customer':
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
     
     airline = request.args.get('airline')
     flight_num = request.args.get('flightnum')
@@ -282,7 +285,7 @@ def completePurchase():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'customer':
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
     
     airline = request.form.get('airline')
     flight_num = request.form.get('flight_num')
@@ -304,7 +307,7 @@ def customerSpending():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'customer':
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
 
     username = session["username"]
     #default date range
@@ -324,7 +327,7 @@ def spendingStatsData():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'customer':
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
 
     username = session["username"]
 
@@ -379,7 +382,7 @@ def analyticsA():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'agent':   
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
 
     agent_email = session.get('username')
     commissions_total = commission_totals_last_30(agent_email)
@@ -402,7 +405,7 @@ def checkoutAgent():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'agent':
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
 
     airline = request.args.get('airline')
     flight_num = request.args.get('flightnum')
@@ -418,7 +421,7 @@ def completePurchaseAgent():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'agent':
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
 
     print("I trying to purchase.")
     airline = request.form.get('airline')
@@ -445,7 +448,7 @@ def upcomingFlightsStaff():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'airline_staff':
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
     
     return render_template('upcomingFlights.html',table=upcomingFlightsByAirline(session.get('associated_airline')[0]))
 
@@ -454,7 +457,7 @@ def passengerList():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'airline_staff':
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
     
     table, columns = passengersPerFlight(session.get('associated_airline')[0])
     return render_template('passengerList.html',table=table,columns=columns)
@@ -464,7 +467,7 @@ def flightsTakenByCustomer():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'airline_staff':
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
     
     airline = session.get('associated_airline')[0]
     customers_list = list_of_customers(airline)
@@ -492,7 +495,7 @@ def analyticsStaff():
     if 'username' not in session:
         return redirect(url_for('home'))
     elif session.get("user_type") != 'airline_staff':
-        return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
+        return render_template('home.html')
     
     airline = session.get('associated_airline')[0]
     print(airline)
@@ -546,7 +549,7 @@ def addAirplane():
     elif 'admin' not in session.get("special_perm"):
         return redirect(url_for('home'))
     
-    return render_template('admin-add.html', add_type="airplane", airline=session.get('associated_airline')[0])
+    return render_template('admin-add.html',add_type="airplane", airline=session.get('associated_airline')[0])
 
 
 @app.route('/createFlight')
@@ -574,7 +577,7 @@ def assignAgent():
     
     airline_name = session.get('associated_airline')[0]
     agents = list_of_agents()
-    return render_template('admin-add.html', add_type="assignAgent", airline=airline_name, agents=agents)
+    return render_template('admin-add.html',add_type="assignAgent", airline=airline_name, agents=agents)
 
 
 # *update status --> operator permission
@@ -604,7 +607,7 @@ def updateStatus():
         cur.close()
         conn.close()
 
-    return render_template('modify-status.html', airline=airline_name, flights=flights)
+    return render_template('modify-status.html',airline=airline_name, flights=flights)
 
 @app.route('/confirmStatusUpdate', methods=['POST'])
 def confirmStatusUpdate():
@@ -663,7 +666,7 @@ def _render_modify_status(airline_name, success=None, error=None):
         cur.close()
         conn.close()
 
-    return render_template('modify-status.html', airline=airline_name, flights=flights,
+    return render_template('modify-status.html',airline=airline_name, flights=flights,
                            success=success, error=error)
 
 @app.route('/confirmAddition', methods=['POST'])
@@ -855,7 +858,7 @@ def confirmAddition():
 
     # ---------- FALLBACK ----------
     else:
-        return render_template('admin-add.html', add_type=add_type, error="Unsupported add-type.")
+        return render_template('admin-add.html',add_type=add_type, error="Unsupported add-type.")
 
 
 
@@ -870,8 +873,15 @@ def inject_city_aliases():
     conn.close()
     return {"city_aliases": rows}
 
+# each html page wants user_type, special_perm, etc. to render the options.
+@app.context_processor
+def inject_user_data():
+    return dict(
+        isLoggedIn = 'username' in session,
+        usertype=session.get("user_type"),
+        specialperm=session.get("special_perm"),
+        username=session.get("username")
+    )
 
 if __name__ == "__main__":
     app.run('127.0.0.1', 5000, debug = True)
-
-

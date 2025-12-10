@@ -9,21 +9,66 @@ td {
     padding: 10px;
 }
 
-.basicHomeFuncs {
+.topBar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 100px;
+    height: 70px;
 
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid #cbd5e0;
     background-color: aliceblue;
+
+    padding: 0 20px;
 }
 
-body {
-    padding-top: 110px;
+.sideNav {
+    position: fixed;
+    top: 71px;
+    left: 0;
+    width: 220px;
+    height: calc(100vh - 110px);
+
+    background: #f6faff;
+    border-right: 1px solid #cbd5e0;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.main-content {
+    margin-top: 71px;
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.sideNav h3 {
+    font-size: 16px;
+    margin-top: 20px;
+    color: #003366;
+}
+
+.sideNav a {
+    display: block;
+    text-decoration: none;
+    color: #003366;
+    padding: 8px 4px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.webpage-title {
+    font-size: 50px;
+    font-weight: bold;
+    color: #111a93;
+}
+
+.username {
+    margin-right: 15px;
+    font-weight: bold;
+    color: #333;
 }
 
 .page-link,
@@ -39,4 +84,8 @@ body {
 
 .logout-link {
     color: darkred;
+}
+
+form input {
+    display: block;
 }

@@ -1,0 +1,20 @@
+body {
+    background-image: url("/static/images/airport.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0;
+    min-height: 100vh;
+}
+
+.box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+}
+
+.main-content {
+    background-color: rgba(82, 228, 226, 0.483);
+}
