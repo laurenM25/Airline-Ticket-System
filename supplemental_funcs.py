@@ -292,7 +292,7 @@ def reject_request(request_id):
     #if data, simply remove the row
     query = "DELETE FROM register_requests WHERE request_id = %s"
     cursor.execute(query,(request_id,))
-    
+    conn.commit()
 
     cursor.close()
     conn.close()
