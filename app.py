@@ -6,7 +6,8 @@ from supplemental_funcs import (
     check_special_perm, check_related_airline,
     create_purchase_ticket_transaction,
     airplanes_for_airline, airports_list,
-    list_of_agents, list_of_customers
+    list_of_agents, list_of_customers,
+    AgentIsAuthorizedByAirline
 )
 import datetime
 from db import pool
@@ -375,6 +376,10 @@ def browseFlightsAgent():
     elif session.get("user_type") != 'agent':
         return render_template('home.html', usertype=session.get("user_type"),specialperm =session.get("special_perm"))
     
+    assoc = session.get('associated_airline')
+    if not assoc:
+        return render_template('home.html', error="You are not associated with an airline yet. Please wait for someone to assign you and relogin to use related tools.")
+    
     return render_template('browse-agent.html',table=browseFlightsByAirline(session.get('associated_airline')))
 
 @app.route('/analyticsA')
@@ -409,7 +414,6 @@ def checkoutAgent():
 
     airline = request.args.get('airline')
     flight_num = request.args.get('flightnum')
-    agent_email = session.get("username")
 
     flight_info_row, columns = return_confirm_flight_to_purchase(airline,flight_num)
 
@@ -423,17 +427,18 @@ def completePurchaseAgent():
     elif session.get("user_type") != 'agent':
         return render_template('home.html')
 
-    print("I trying to purchase.")
     airline = request.form.get('airline')
     flight_num = request.form.get('flight_num')
     cust_username = request.form.get('cust_username')
     agent_email = session.get("username")
     num_tickets = int(request.form.get("quantity"))
 
+    #double-verify agent is authorized to purchase ticket for this airline
+    if not AgentIsAuthorizedByAirline(agent_email,airline):
+        return redirect(url_for('home'))
+
     #try to create tickets and purchases, add to database
     #airline, flight_num, customer_email,num_tickets
-
-    print("I tried to purchase.")
 
     create_purchase_ticket_transaction(airline,flight_num,cust_username,num_tickets,agent_email=agent_email)
 
@@ -450,6 +455,10 @@ def upcomingFlightsStaff():
     elif session.get("user_type") != 'airline_staff':
         return render_template('home.html')
     
+    assoc = session.get('associated_airline')
+    if not assoc:
+        return render_template('home.html', error="No airline associated with your account. Contact admin.")
+
     return render_template('upcomingFlights.html',table=upcomingFlightsByAirline(session.get('associated_airline')[0]))
 
 @app.route('/passengerList') #filter by 1) flight or 2) customer
@@ -459,6 +468,10 @@ def passengerList():
     elif session.get("user_type") != 'airline_staff':
         return render_template('home.html')
     
+    assoc = session.get('associated_airline')
+    if not assoc:
+        return render_template('home.html', error="No airline associated with your account. Contact admin.")
+
     table, columns = passengersPerFlight(session.get('associated_airline')[0])
     return render_template('passengerList.html',table=table,columns=columns)
 
@@ -469,6 +482,10 @@ def flightsTakenByCustomer():
     elif session.get("user_type") != 'airline_staff':
         return render_template('home.html')
     
+    assoc = session.get('associated_airline')
+    if not assoc:
+        return render_template('home.html', error="No airline associated with your account. Contact admin.")
+
     airline = session.get('associated_airline')[0]
     customers_list = list_of_customers(airline)
 
@@ -480,6 +497,10 @@ def flightsTakenByCustomer():
 def customersFlightsData():
     if 'username' not in session or session.get("user_type") != 'airline_staff':
         return jsonify({"flights": []})
+
+    assoc = session.get('associated_airline')
+    if not assoc:
+        return render_template('home.html', error="No airline associated with your account. Contact admin.")
 
     airline = session.get('associated_airline')[0]
     customer_email = request.args.get("customer_email")
@@ -497,6 +518,10 @@ def analyticsStaff():
     elif session.get("user_type") != 'airline_staff':
         return render_template('home.html')
     
+    assoc = session.get('associated_airline')
+    if not assoc:
+        return render_template('home.html', error="No airline associated with your account. Contact admin.")
+
     airline = session.get('associated_airline')[0]
     print(airline)
 
@@ -549,6 +574,10 @@ def addAirplane():
     elif 'admin' not in session.get("special_perm"):
         return redirect(url_for('home'))
     
+    assoc = session.get('associated_airline')
+    if not assoc:
+        return render_template('home.html', error="No airline associated with your account. Contact admin.")
+
     return render_template('admin-add.html',add_type="airplane", airline=session.get('associated_airline')[0])
 
 
@@ -622,7 +651,7 @@ def confirmStatusUpdate():
     flight_num = (request.form.get('flight-num') or "").strip()
     new_status = (request.form.get('new-status') or "").strip()
 
-    allowed = {"upcoming", "in-progress", "delayed"}
+    allowed = {"upcoming", "in-progress", "delayed", "completed"}
     if (not flight_num) or (new_status not in allowed):
         # re-render with error + flight list
         return _render_modify_status(airline_name, error="Invalid flight or invalid status.")
@@ -757,8 +786,8 @@ def confirmAddition():
         airline_name = session.get('associated_airline')[0]
 
         flight_num = request.form['flight-num'].strip()
-        dep_time  = datetime.fromisoformat(request.form['departure-time'].strip())
-        arr_time  = datetime.fromisoformat(request.form['arrival-time'].strip())
+        dep_time  = datetime.datetime.fromisoformat(request.form['departure-time'].strip())
+        arr_time  = datetime.datetime.fromisoformat(request.form['arrival-time'].strip())
         price     = request.form['ticket-price'].strip()
         plane_id  = request.form['plane-id'].strip()
         dep_airpt = request.form['departure-airport'].strip().upper()

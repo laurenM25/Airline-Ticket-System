@@ -61,6 +61,9 @@
         Welcome {{username}}.
         <a class='public-link' href="/upcomingFlights">Check out upcoming flights</a>
         <a class='public-link' href="/flightStatus">Check flight status for an in-progress flight</a>
+        {% if error %}
+        <br><span>{{error}}</span>
+        {% endif %}
     </div>
 </body>
 

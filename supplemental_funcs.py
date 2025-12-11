@@ -41,7 +41,7 @@ def check_related_airline(username, user_type):
         if data:
             return [data[0]]  # return list
         else:
-            return []
+            return None
     elif user_type == "agent":
         query = "SELECT airline_name FROM authorized_by WHERE agent_email = %s"
         cursor = conn.cursor()
@@ -50,8 +50,11 @@ def check_related_airline(username, user_type):
         cursor.close()
         conn.close()
 
-        return [row[0] for row in rows]
-
+        if rows: #could be that the agent hasn't been assigned yet
+            return [row[0] for row in rows]
+        else:
+            return None
+        
     else:
         return None
 
@@ -163,6 +166,18 @@ def compute_monthly_totals(data_rows, last_n_months=6):
     last_month_keys.reverse()
 
     return {key: totals.get(key, 0) for key in last_month_keys} #return data with relevant year-month pairings
+
+def AgentIsAuthorizedByAirline(agent_email, airline):
+    conn = pool.get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM authorized_by WHERE agent_email = %s AND airline_name = %s",(agent_email,airline))
+    data=cursor.fetchone()
+
+    if data:
+        return True
+    else:
+        return False
 
 #UPDATE TO ALLOW FOR MULTIPLE TICKETS IN ONE TRANSACTION
 def create_purchase_ticket_transaction(airline, flight_num, customer_email, num_tickets, agent_email=None):
