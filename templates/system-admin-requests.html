@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="../static/general.css">
+    <title>Air Ticket Reservation</title>
+</head>
+
+<body>
+    <div class="topBar">
+        <div class="left-top"></div>
+        <div class="center-top">
+            <span class="webpage-title">Air Ticket Reservation </span>
+        </div>
+        <div class="right-top">
+            <span class="username">Welcome {{username}}</span>
+            <a class='logout-link' href="/logout">log out</a>
+        </div>
+    </div>
+    <div class="sideNav">
+        <h3>Tools</h3>
+        <a href="/system-admin/dashboard">Dashboard</a>
+        <a href="/system-admin/requests">View Registration Requests</a>
+        <a class='public-link' href="/upcomingFlights">View Upcoming Flights</a>
+        <a class='public-link' href="/flightStatus">Check Flight Status</a>
+    </div>
+    <div class="main-content">
+        {% if not rows %}
+        <p>No requests to process. Check back later.</p>
+        {% endif %}
+        {% if rows %}
+        <table>
+            <tr>
+                {% for col in columns %}
+                <th>{{col}}</th>
+                {% endfor %}
+                <th> </th>
+                <th> </th>
+            </tr>
+            {% for row in rows %}
+            <tr>
+                {% for item in row %}
+                <td>{{item}}</td>
+                {% endfor %}
+                <td> <!--approve button-->
+                    <form action="/system-admin/approveRequest" onsubmit="return confirm('Approve this request?');"
+                        method="POST">
+                        <input type="hidden" name="request_id" value="{{row[0]}}">
+                        <button type="submit">Approve</button>
+                    </form>
+                </td>
+                <td><!--reject button-->
+                    <form action="/system-admin/rejectRequest" onsubmit="return confirm('Reject this request?');"
+                        method="POST">
+                        <input type="hidden" name="request_id" value="{{row[0]}}">
+                        <button type="submit">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+</body>
+
+</html>

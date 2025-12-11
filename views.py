@@ -101,6 +101,7 @@ def purchasedFlightsView_agent(agent_email):
 def browseFlightsByAirline(airlines):
     if airlines is None:
         return None
+    
     formatted_airlines = ",".join(["%s"] * len(airlines))
 
     conn = pool.get_connection()

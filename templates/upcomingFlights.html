@@ -26,6 +26,9 @@
     <div class="sideNav">
 
         <h3>Tools</h3>
+        {% if usertype == "system_admin" %}
+        <a href="/system-admin/dashboard">Dashboard</a>
+        {% endif %}
         {% if not isLoggedIn %}
         <span>Please log in to use tools.</span>
         {% endif %}

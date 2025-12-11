@@ -15,6 +15,15 @@
             <option value="airline_staff">Airline Staff</option>
         </select>
         <input type="submit" value=Login />
+
+        <!--added the following to display success message-->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, msg in messages %}
+        <div class="{{ category }}">{{ msg }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
         {% if error %}
         <p class="error"><strong>Error:</strong> {{error}}</p>
         {% endif %}

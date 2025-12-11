@@ -18,3 +18,4 @@ pool = MySQLConnectionPool(
     password=db_password,
     database="air_ticket_reservation_db"
 )
+

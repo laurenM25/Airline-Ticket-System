@@ -7,7 +7,8 @@ from supplemental_funcs import (
     create_purchase_ticket_transaction,
     airplanes_for_airline, airports_list,
     list_of_agents, list_of_customers,
-    AgentIsAuthorizedByAirline
+    AgentIsAuthorizedByAirline,
+    get_pending_requests, approve_request, reject_request
 )
 import datetime
 from db import pool
@@ -15,7 +16,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector 
 from supplemental_funcs import compute_monthly_totals
 from views import topCustomer_byTickets, topCustomer_byCommission, commission_totals_last_30, average_commission_last_30, num_tickets_sold_all_time
-
+from flask import flash #for success message and avoiding a mess when inserting into redirect
 
 #Initialize the app from Flask
 app = Flask(__name__)
@@ -35,7 +36,107 @@ def hello():
 def home():
     if 'username' not in session:
         return render_template('index.html')
+    if session['user_type'] == 'system_admin':
+        return redirect(url_for('systemAdminDashboard'))
     return render_template('home.html', username=session.get("username"))
+
+""" The following methods were added Dec 11, 2025. To upgrade the security of our database and ensure 
+new staff have been authenticated before completing the registration of their account, 
+we have created a new user type, 'system admin'.
+
+Requests to create a staff account will now be stored in the register_requests table of our database,
+and only system admin can approve the request to complete the registration of staff accounts.
+
+This prevents anyone from creating an account and peering into the analytics of a particular airline,
+as well as prevents unauthenticated users from performing admin / operator tasks,
+which have the power to significantly modify the database.
+
+We have designated a unique login page for system admin, and the access pages for system admin (except for login)
+will be strictly checked for permissions.
+
+"""
+@app.route('/system-admin/login')
+def systemAdminLogin():
+    return render_template('system-admin-login.html')
+
+@app.route('/system-admin/loginAuth', methods=["POST","GET"])
+def systemAdminLoginAuth():
+    #if user tries to access login authentication page without comin from login, this is bad bc we don't accept get. so redirect
+    if request.method == "GET":
+        return redirect(url_for('systemAdminLogin'))
+    
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    conn = pool.get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # filter by username
+    query = f"SELECT * FROM system_admin WHERE username = %s"
+    cursor.execute(query, (username,))
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    # row["password"] contains the HASH now
+    if row and check_password_hash(row["password"], password):
+        session['username'] = username
+        session['user_type'] = 'system_admin'
+        return redirect(url_for('systemAdminDashboard'))
+    
+    else:
+        return render_template('system-admin-login.html', error="Error: invalid username or password")
+
+@app.route('/system-admin/dashboard')
+def systemAdminDashboard():
+    if 'username' not in session:
+        return redirect(url_for('systemAdminLogin'))
+    if session['user_type'] != 'system_admin':
+        return redirect(url_for('home'))
+    
+    return render_template('system-admin-dashboard.html')
+
+@app.route('/system-admin/requests')
+def systemAdminRequests():
+    if 'username' not in session:
+        return redirect(url_for('systemAdminLogin'))
+    if session['user_type'] != 'system_admin':
+        return redirect(url_for('home'))
+    
+    requests_table, columns = get_pending_requests()
+    return render_template('system-admin-requests.html',rows=requests_table, columns=columns)
+
+@app.route('/system-admin/approveRequest',methods=["POST"])
+def systemAdminApproveRequest():
+    if 'username' not in session:
+        return redirect(url_for('systemAdminLogin'))
+    if session['user_type'] != 'system_admin':
+        return redirect(url_for('home'))
+    
+    #process the approval
+    request_id = request.form.get('request_id')
+    approve_request(request_id)
+
+    return redirect(url_for('systemAdminRequests'))
+
+@app.route('/system-admin/rejectRequest', methods=["POST"])
+def systemAdminRejectRequest():
+    if 'username' not in session:
+        return redirect(url_for('systemAdminLogin'))
+    if session['user_type'] != 'system_admin':
+        return redirect(url_for('home'))
+    
+    #process the approval
+    request_id = request.form.get('request_id')
+    reject_request(request_id)
+
+    return redirect(url_for('systemAdminRequests'))
+
+
+"""
+end of methods added Dec 11, 2025.
+"""
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -148,10 +249,16 @@ def registerAgentAuth():
         cur.close(); conn.close()
 
 
+#UPDATING DEC 11 - REGISTRATION REQUEST WILL GO TO register_requests TABLE INSTEAD.
+#airline staff (from Dec 11, 2025 forward) must have their request approved by 
+#the system admin in order to complete registration.
 @app.route('/registerStaffAuth', methods=['POST'])
 def registerStaffAuth():
     username = request.form['username'].strip()
     password = request.form['password']
+    first_name = request.form['fname'].strip()
+    last_name = request.form['lname'].strip()
+    DOB = request.form['DOB'].strip()
     airline_name = request.form['airline_name'].strip()
     permission_type = request.form['permission_type'].strip()  # "admin" or "operator"
     pw_hash = generate_password_hash(password)
@@ -159,15 +266,14 @@ def registerStaffAuth():
     conn = pool.get_connection()
     cur = conn.cursor()
     try:
+        #add into REGISTER_REQUESTS table
         cur.execute(
-            "INSERT INTO airline_staff (username, password, airline_name) VALUES (%s, %s, %s)",
-            (username, pw_hash, airline_name)
-        )
-        cur.execute(
-            "INSERT INTO permission (permission_type, airline_staff_username) VALUES (%s, %s)",
-            (permission_type, username)
+            "INSERT INTO register_requests (username,password,first_name,last_name,date_of_birth,airline_name,permission_type) VALUES (%s, %s, %s,%s, %s, %s,%s)",
+            (username, pw_hash, first_name, last_name, DOB, airline_name,permission_type)
         )
         conn.commit()
+
+        flash("Registration request submitted. Please wait for approval.", "success")
         return redirect(url_for('login'))
     except mysql.connector.IntegrityError:
         conn.rollback()

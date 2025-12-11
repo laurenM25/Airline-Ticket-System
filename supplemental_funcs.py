@@ -174,6 +174,9 @@ def AgentIsAuthorizedByAirline(agent_email, airline):
     cursor.execute("SELECT * FROM authorized_by WHERE agent_email = %s AND airline_name = %s",(agent_email,airline))
     data=cursor.fetchone()
 
+    cursor.close()
+    conn.close() 
+
     if data:
         return True
     else:
@@ -221,25 +224,75 @@ def create_purchase_ticket_transaction(airline, flight_num, customer_email, num_
         cursor.close()
         conn.close()
 
-def register_account(user_type,username,password,airline=None,fname=None,lname=None,DOB=None,name=None):
+
+    
+"""
+functions related to system admin -- added December 11th, 2025.
+"""
+def get_pending_requests():
     conn = pool.get_connection()
     cursor = conn.cursor()
 
-    #use parameterized queries to be safer
-    if user_type == "customer":
-        #update customer form info to allow for address input and other optional info
-        cursor.execute("INSERT INTO customer(email,name,password) VALUES(%s,%s,%s)", (username,name,password))
-        
-    
-    elif user_type == "agent":
-        cursor.execute("INSERT INTO booking_agent(email,password) VALUES(%s,%s)", (username,password))
+    cursor.execute('SELECT request_id, username, first_name, last_name, date_of_birth, airline_name, permission_type FROM register_requests')
+    rows = cursor.fetchall()
+    columns = "request_id, username, first_name, last_name, date_of_birth, airline_name, permission_type".split(", ")
 
-    elif user_type == "airline_staff":
-        cursor.execute(
-    "INSERT INTO airline_staff(username,password,first_name,last_name,date_of_birth,airline_name) VALUES (%s,%s,%s,%s,%s,%s)",
-    (username, password, fname, lname, DOB, airline)
-)
-    conn.commit()
     cursor.close()
     conn.close()
+
+    return rows, columns
+
+def approve_request(request_id):
+    conn = pool.get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT username, password, first_name, last_name, date_of_birth, airline_name, permission_type FROM register_requests WHERE request_id = %s',(request_id,))
+    row = cursor.fetchone()
+
+    #if no matching request_id, stop
+    if not row:
+        cursor.close()
+        conn.close() 
+        return
     
+    #if data, begin transaction where we add the data into the airline_staff table and remove the request from the register_requests table
+    username, password, first_name, last_name, date_of_birth, airline_name, permission_type = row
+
+    try:
+        query = "INSERT INTO airline_staff VALUES(%s,%s,%s,%s,%s,%s)"
+        cursor.execute(query,(username, password, first_name, last_name, date_of_birth, airline_name))
+        cursor.execute("INSERT INTO permission VALUES(%s,%s)",(permission_type,username))
+
+        query = "DELETE FROM register_requests WHERE request_id = %s"
+        cursor.execute(query,(request_id,))
+
+        conn.commit() 
+    except Exception as e:
+        conn.rollback()
+        raise e
+
+    finally:
+        cursor.close()
+        conn.close() 
+
+
+def reject_request(request_id):
+    conn = pool.get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM register_requests WHERE request_id = %s',(request_id,))
+    row = cursor.fetchone()
+
+    #if no matching request_id, stop
+    if not row:
+        cursor.close()
+        conn.close() 
+        return
+    
+    #if data, simply remove the row
+    query = "DELETE FROM register_requests WHERE request_id = %s"
+    cursor.execute(query,(request_id,))
+    
+
+    cursor.close()
+    conn.close()

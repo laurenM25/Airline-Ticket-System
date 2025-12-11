@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="../static/general.css">
+    <link rel="stylesheet" href="../static/home.css">
+    <title>Air Ticket Reservation</title>
+</head>
+
+<body>
+    <div class="topBar">
+        <div class="left-top"></div>
+        <div class="center-top">
+            <span class="webpage-title">Air Ticket Reservation </span>
+        </div>
+        <div class="right-top">
+            <span class="username">Welcome {{username}}</span>
+            <a class='logout-link' href="/logout">log out</a>
+        </div>
+    </div>
+    <div class="sideNav">
+        <h3>Tools</h3>
+        <a href="/system-admin/dashboard">Dashboard</a>
+        <a href="/system-admin/requests">View Registration Requests</a>
+        <a class='public-link' href="/upcomingFlights">View Upcoming Flights</a>
+        <a class='public-link' href="/flightStatus">Check Flight Status</a>
+    </div>
+    <div class="main-content">
+        Welcome {{username}}.
+        {% if error %}
+        <br><span>{{error}}</span>
+        {% endif %}
+    </div>
+</body>
+
+</html>

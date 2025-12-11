@@ -141,3 +141,22 @@ create table city_alias (
         on delete cascade
         on update cascade);
 
+-- adding two tables for a special user type: system admin
+create table system_admin(
+    username varchar(100) primary key,
+    password text not null,
+    created_at TIMESTAMP
+);
+
+create table register_requests(
+    request_id INT AUTO_INCREMENT PRIMARY KEY,
+    username varchar(100) UNIQUE,
+    password text NOT NULL,
+    first_name varchar(100),
+    last_name varchar(100),
+    date_of_birth date,
+    airline_name varchar(100),
+    permission_type varchar(100) check (permission_type in ('admin', 'operator')),
+    FOREIGN KEY (airline_name) REFERENCES airline(name) on delete cascade 
+        on update cascade
+);

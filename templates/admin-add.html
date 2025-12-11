@@ -107,7 +107,11 @@
 
         <!--adding flight-->
         {% if add_type=="flight" %}
-
+        <p>Note: Due to times being stored and interpret in the local timezone of the arrival or destination city, the
+            arrival time is allowed to be 'before' the departure time. For example, a flight leaving on Tuesday at
+            4:30PM from South Korea may land Tuesday at 11:30AM in California. Therefore, no constraint is placed on the
+            arrival time being after the departure time. Staff are expected to fill in the correct times given the
+            complexity of calculating time differences across timezones.</p><br>
         {% if success %}
         <p style="color: green; font-weight: 600;">{{ success }}</p>
         {% endif %}
